@@ -1,0 +1,213 @@
+/* ========================================
+   USER MANAGEMENT CSS
+   ======================================== */
+
+/* User Filter Section */
+.user-filter .form-control {
+    height: 45px !important;
+    padding: 8px 12px !important;
+}
+
+.user-filter select {
+    padding-right: 25px !important;
+    background-position: right 8px center !important;
+}
+
+.user-filter input[type="text"] {
+    height: 45px !important;
+}
+
+/* User Table */
+.user-table td {
+    vertical-align: middle !important;
+    padding: 12px 8px !important;
+}
+
+.user-table .btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* User Avatar */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #dee2e6;
+}
+
+.user-avatar-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #dee2e6;
+}
+
+/* User Name Display */
+.user-name {
+    font-weight: 500;
+    color: #212529;
+}
+
+.user-name:hover {
+    color: #007bff;
+    text-decoration: none;
+}
+
+/* User Email */
+.user-email {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* User Role Badges */
+.user-role-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.user-role-badge.role-admin {
+    background-color: #dc3545;
+    color: white;
+}
+
+.user-role-badge.role-staff {
+    background-color: #007bff;
+    color: white;
+}
+
+.user-role-badge.role-customer {
+    background-color: #28a745;
+    color: white;
+}
+
+/* User Status Badges */
+.user-status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.user-status-badge.status-active {
+    background-color: #28a745;
+    color: white;
+}
+
+.user-status-badge.status-inactive {
+    background-color: #6c757d;
+    color: white;
+}
+
+.user-status-badge.status-banned {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* User Registration Date */
+.user-registration-date {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* User Last Login */
+.user-last-login {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* User Action Buttons */
+.user-actions {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.user-actions .btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-actions .btn {
+    margin: 0 2px;
+}
+
+/* User Statistics Cards */
+.user-stats .card-body {
+    padding: 1rem !important;
+}
+
+.user-stats .text-xs {
+    line-height: 1.4 !important;
+    padding-top: 3px !important;
+    padding-bottom: 2px !important;
+}
+
+/* User Profile Section */
+.user-profile {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.user-profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.user-profile-info {
+    margin-left: 15px;
+}
+
+.user-profile-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.user-profile-role {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* User Responsive */
+@media (max-width: 768px) {
+    .user-filter .col-md-2,
+    .user-filter .col-md-3 {
+        margin-bottom: 15px;
+    }
+    
+    .user-table {
+        font-size: 0.9rem;
+    }
+    
+    .user-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .user-avatar-large {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .user-profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-profile-info {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}

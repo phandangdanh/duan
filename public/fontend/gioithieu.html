@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ThriftZone - Thời Trang Secondhand</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400&display=swap"
+    rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="trangchu.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    nav.navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+  .banner-khuyen-mai {
+    z-index: 1050;
+  }
+
+  .banner-khuyen-mai img {
+    max-height: 90px;
+    object-fit: cover;
+  }
+
+  </style>
+</head>
+
+<body>
+<section class="banner-khuyen-mai position-relative">
+  <img src="/img/6254356 (1).jpg" 
+       alt="Banner khuyến mãi" 
+       class="w-100 d-block" style="max-height: 180px; object-fit: cover;">
+
+  <!-- Nút đóng -->
+  <button class="btn-close position-absolute top-0 end-0 m-2" 
+          aria-label="Đóng" 
+          onclick="this.parentElement.style.display='none'">
+  </button>
+</section>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<!-- Google Font đẹp -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+  .navbar {
+    background-color: #FFC107; /* Màu vàng */
+  }
+  .nav-link {
+    font-weight: 500;
+    color: #000 !important;
+  }
+  .nav-link:hover {
+    color: #fff !important;
+  }
+  .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #000 !important;
+  }
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #555;
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg shadow-sm">
+  <div class="container">
+    <!-- Logo -->
+    <a class="navbar-brand" href="trangchu.html">ThriftZone</a>
+
+    <!-- Nút mobile toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-chinh">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Nội dung menu -->
+    <div class="collapse navbar-collapse" id="menu-chinh">
+      <!-- Menu trái -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="trangchu.html">Trang chủ</a></li>
+        <li class="nav-item"><a class="nav-link" href="gioithieu.html">Giới thiệu</a></li>
+        <li class="nav-item"><a class="nav-link" href="sanpham.html">Sản phẩm</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.html">Liên hệ</a></li>
+      </ul>
+
+      <!-- Search + Cart -->
+      <form class="d-flex align-items-center me-3 position-relative" role="search">
+        <input class="form-control me-2 ps-5" type="search" placeholder="Tìm kiếm..." aria-label="Search">
+        <i class="bi bi-search position-absolute" style="left: 15px; color: gray;"></i>
+        <a class="nav-link position-relative ms-2" href="giohang.html">
+          <i class="bi bi-bag" style="font-size: 1.5rem;"></i>
+          <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">0</span>
+        </a>
+      </form>
+
+      <!-- Đăng nhập / Đăng ký -->
+      <div class="d-flex">
+        <a href="dangnhap.html" class="btn btn-outline-dark me-2">Đăng nhập</a>
+        <a href="dangki.html" class="btn btn-dark">Đăng ký</a>
+      </div>
+    </div>
+  </div>
+</nav>
+  <!-- Header -->
+  <div class="container text-center mt-5">
+    <h1 class="display-5 fw-bold">Chào mừng đến với <span class="highlight">ThriftZone</span></h1>
+    <p class="lead">Nền tảng thời trang secondhand chất lượng, tiết kiệm và thân thiện môi trường</p>
+  </div>
+
+  <!-- Section: Tầm nhìn & Sứ mệnh -->
+  <div class="container">
+    <div class="section-title">Tầm nhìn & Sứ mệnh</div>
+    <p>
+      Tại ThriftZone, chúng tôi mong muốn trở thành nền tảng mua sắm đồ secondhand hàng đầu Việt Nam. Chúng tôi mang đến những sản phẩm chất lượng, giá cả hợp lý và góp phần vào xu hướng tiêu dùng bền vững.
+    </p>
+  </div>
+
+  <!-- Section: Giá trị cốt lõi -->
+  <div class="container">
+    <div class="section-title">Giá trị cốt lõi</div>
+    <ul>
+      <li>Chất lượng đảm bảo – mỗi sản phẩm được kiểm duyệt kỹ càng.</li>
+      <li>Giá cả hợp lý – giúp khách hàng tiết kiệm nhưng vẫn thời trang.</li>
+      <li>Bảo vệ môi trường – thúc đẩy tiêu dùng tái sử dụng.</li>
+      <li>Đổi trả dễ dàng – hỗ trợ khách hàng linh hoạt và an tâm.</li>
+    </ul>
+  </div>
+
+  <!-- Section: Dịch vụ nổi bật -->
+  <div class="container">
+    <div class="section-title">Dịch vụ nổi bật</div>
+    <div class="row text-center">
+      <div class="col-md-4 mb-3">
+        <img src="/img/image.png" class="img-fluid rounded" alt="Sản phẩm chất lượng">
+        <h5 class="mt-2">Sản phẩm đã kiểm định</h5>
+      </div>
+      <div class="col-md-4 mb-3">
+        <img src="/img/image.png" class="img-fluid rounded" alt="Giao hàng nhanh">
+        <h5 class="mt-2">Giao hàng toàn quốc</h5>
+      </div>
+      <div class="col-md-4 mb-3">
+        <img src="/img/image.png" class="img-fluid rounded" alt="Hỗ trợ khách hàng">
+        <h5 class="mt-2">Hỗ trợ 24/7</h5>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Liên hệ -->
+  <div class="container mb-5">
+    <div class="section-title">Liên hệ chúng tôi</div>
+    <p>
+      📍 Địa chỉ: Trung Mỹ Tây 9, Quận 12, TPHCM<br>
+      📞 Hotline: 0934 988 715<br>
+      ✉️ Email: @thriftzone.vn
+    </p>
+  </div>
+
+  <!-- Footer -->
+ <footer class="bg-warning text-dark mt-5 pt-5 pb-4">
+  <div class="container text-md-left">
+    <div class="row">
+      <!-- Thông tin liên hệ -->
+      <div class="col-md-4 mb-4">
+        <h5 class="text-uppercase fw-bold mb-3">Thông tin liên hệ</h5>
+        <ul class="list-unstyled">
+          <li>Địa chỉ: TP.HCM</li>
+          <li>Email: support@thriftzone.vn</li>
+          <li>Điện thoại: 0909 123 456</li>
+        </ul>
+      </div>
+
+      <!-- Về ThriftZone -->
+      <div class="col-md-4 mb-4">
+        <h5 class="text-uppercase fw-bold mb-3">Về ThriftZone</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-dark text-decoration-none">Giới thiệu</a></li>
+          <li><a href="#" class="text-dark text-decoration-none">Chính sách đổi trả</a></li>
+          <li><a href="#" class="text-dark text-decoration-none">Hướng dẫn mua hàng</a></li>
+        </ul>
+      </div>
+
+      <!-- Hỗ trợ khách hàng -->
+      <div class="col-md-4 mb-4">
+        <h5 class="text-uppercase fw-bold mb-3">Hỗ trợ khách hàng</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-dark text-decoration-none">Liên hệ</a></li>
+          <li><a href="#" class="text-dark text-decoration-none">FAQ</a></li>
+          <li><a href="#" class="text-dark text-decoration-none">Phản hồi</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Dòng bản quyền -->
+    <div class="text-center pt-3 border-top border-dark mt-3">
+      © 2025 <strong>ThriftZone</strong> – All rights reserved.
+    </div>
+  </div>
+</footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

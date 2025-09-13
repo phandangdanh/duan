@@ -1,0 +1,2562 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "DuAnTotNghiep API",
+        "description": "REST API documentation for Users and other resources",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/duan/duan/duantotnghiep/public",
+            "description": "Localhost base path"
+        }
+    ],
+    "paths": {
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "3. Categories"
+                ],
+                "summary": "Danh sách danh mục",
+                "operationId": "0cf80081861eb6ffd486250b4a7029c5",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo tên/slug",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Đồ uống"
+                    },
+                    {
+                        "name": "all",
+                        "in": "query",
+                        "description": "Lấy tất cả thay vì phân trang",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "example": true
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Trang hiện tại",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "example": 1
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Số bản ghi mỗi trang",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        },
+                        "example": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "name": "Đồ uống",
+                                            "slug": "do-uong",
+                                            "status": "active"
+                                        }
+                                    ],
+                                    "pagination": null,
+                                    "message": "Lấy danh sách danh mục thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Có lỗi xảy ra"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "3. Categories"
+                ],
+                "summary": "Tạo danh mục",
+                "operationId": "5dfd784451ebf12040d3147f424eed8a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {},
+                            "example": {
+                                "name": "Đồ uống",
+                                "slug": "do-uong",
+                                "parent_id": null,
+                                "description": "Nhóm đồ uống",
+                                "status": "active"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tạo mới thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": {
+                                        "id": 10,
+                                        "name": "Đồ uống"
+                                    },
+                                    "message": "Tạo danh mục thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi"
+                    }
+                }
+            }
+        },
+        "/api/categories/{id}": {
+            "get": {
+                "tags": [
+                    "3. Categories"
+                ],
+                "summary": "Chi tiết danh mục",
+                "operationId": "43441a050984320bfd5e893ebcc3c9bc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": {
+                                        "id": 1,
+                                        "name": "Đồ uống",
+                                        "slug": "do-uong"
+                                    },
+                                    "message": "Lấy thông tin danh mục thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "3. Categories"
+                ],
+                "summary": "Cập nhật danh mục",
+                "operationId": "23caa6785739fd4f0454de2e99fdf09c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {},
+                            "example": {
+                                "name": "Đồ uống 2025",
+                                "slug": "do-uong-2025",
+                                "parent_id": null,
+                                "description": "Cập nhật",
+                                "status": "active"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cập nhật thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": {
+                                        "id": 10,
+                                        "name": "Đồ uống 2025"
+                                    },
+                                    "message": "Cập nhật danh mục thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "3. Categories"
+                ],
+                "summary": "Xóa danh mục",
+                "operationId": "d6c0bcd846044c131ece10f8aadefb10",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Xóa thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "message": "Xóa danh mục thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi"
+                    }
+                }
+            }
+        },
+        "/api/locations/provinces": {
+            "get": {
+                "tags": [
+                    "1. Location"
+                ],
+                "summary": "Lấy danh sách tỉnh/thành phố",
+                "description": "API này trả về danh sách tất cả tỉnh/thành phố trong hệ thống. Có thể tìm kiếm theo tên tỉnh/thành phố.",
+                "operationId": "getProvinces",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo tên tỉnh/thành phố",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Hồ Chí Minh"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": [
+                                        {
+                                            "code": 79,
+                                            "name": "Hồ Chí Minh",
+                                            "name_en": "Ho Chi Minh",
+                                            "full_name": "Thành phố Hồ Chí Minh",
+                                            "full_name_en": "Ho Chi Minh City",
+                                            "code_name": "ho_chi_minh",
+                                            "administrative_unit_id": 1,
+                                            "administrative_region_id": 7
+                                        }
+                                    ],
+                                    "message": "Lấy danh sách tỉnh/thành phố thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Có lỗi xảy ra"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/locations/districts": {
+            "get": {
+                "tags": [
+                    "1. Location"
+                ],
+                "summary": "Lấy danh sách quận/huyện theo tỉnh/thành phố",
+                "description": "API này trả về danh sách quận/huyện thuộc một tỉnh/thành phố cụ thể. Cần truyền mã tỉnh/thành phố.",
+                "operationId": "getDistricts",
+                "parameters": [
+                    {
+                        "name": "province_code",
+                        "in": "query",
+                        "description": "Mã tỉnh/thành phố",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 79
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo tên quận/huyện",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "12"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": [
+                                        {
+                                            "code": 761,
+                                            "name": "12",
+                                            "name_en": "12",
+                                            "full_name": "Quận 12",
+                                            "full_name_en": "District 12",
+                                            "code_name": "12",
+                                            "province_code": 79,
+                                            "administrative_unit_id": 5
+                                        }
+                                    ],
+                                    "message": "Lấy danh sách quận/huyện thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Có lỗi xảy ra"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/locations/wards": {
+            "get": {
+                "tags": [
+                    "1. Location"
+                ],
+                "summary": "Lấy danh sách phường/xã theo quận/huyện",
+                "description": "API này trả về danh sách phường/xã thuộc một quận/huyện cụ thể. Cần truyền mã quận/huyện.",
+                "operationId": "getWards",
+                "parameters": [
+                    {
+                        "name": "district_code",
+                        "in": "query",
+                        "description": "Mã quận/huyện",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 761
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo tên phường/xã",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Tân Thới Hiệp"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": [
+                                        {
+                                            "code": 26782,
+                                            "name": "Tân Thới Hiệp",
+                                            "name_en": "Tan Thoi Hiep",
+                                            "full_name": "Phường Tân Thới Hiệp",
+                                            "full_name_en": "Tan Thoi Hiep Ward",
+                                            "code_name": "tan_thoi_hiep",
+                                            "district_code": 761,
+                                            "administrative_unit_id": 8
+                                        }
+                                    ],
+                                    "message": "Lấy danh sách phường/xã thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Có lỗi xảy ra"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/locations/full-address": {
+            "get": {
+                "tags": [
+                    "1. Location"
+                ],
+                "summary": "Lấy địa chỉ đầy đủ theo mã phường/xã",
+                "description": "API này trả về thông tin địa chỉ đầy đủ (tỉnh/thành phố, quận/huyện, phường/xã) khi truyền mã phường/xã.",
+                "operationId": "getFullAddress",
+                "parameters": [
+                    {
+                        "name": "ward_code",
+                        "in": "query",
+                        "description": "Mã phường/xã",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 26782
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": {
+                                        "province": {
+                                            "code": 79,
+                                            "name": "Hồ Chí Minh"
+                                        },
+                                        "district": {
+                                            "code": 761,
+                                            "name": "12"
+                                        },
+                                        "ward": {
+                                            "code": 26782,
+                                            "name": "Tân Thới Hiệp"
+                                        },
+                                        "full_address": "Tân Thới Hiệp, 12, Hồ Chí Minh"
+                                    },
+                                    "message": "Lấy địa chỉ đầy đủ thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Có lỗi xảy ra"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/orders": {
+            "get": {
+                "tags": [
+                    "5. Orders"
+                ],
+                "summary": "Danh sách đơn hàng (có phân trang)",
+                "description": "API này trả về danh sách đơn hàng với phân trang và các bộ lọc. Hỗ trợ tìm kiếm theo mã đơn hàng, tên khách hàng, trạng thái.",
+                "operationId": "getOrders",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo mã đơn hàng, tên khách hàng",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Trang hiện tại",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Số bản ghi mỗi trang",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái đơn hàng",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cho_xac_nhan",
+                                "da_xac_nhan",
+                                "dang_giao",
+                                "da_giao",
+                                "da_huy",
+                                "hoan_tra"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "ID khách hàng",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Từ ngày (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Đến ngày (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "min_amount",
+                        "in": "query",
+                        "description": "Số tiền tối thiểu",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "max_amount",
+                        "in": "query",
+                        "description": "Số tiền tối đa",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "id_user": 1,
+                                            "trangthai": "cho_xac_nhan",
+                                            "trangthai_text": "Chờ xác nhận",
+                                            "ngaytao": "2024-01-15T10:30:00.000000Z",
+                                            "ngaythanhtoan": null,
+                                            "tongtien": 500000,
+                                            "tongtien_formatted": "500.000 VNĐ",
+                                            "hoten": "Nguyễn Văn A",
+                                            "email": "nguyenvana@email.com",
+                                            "sodienthoai": "0123456789",
+                                            "diachigiaohang": "123 Đường ABC, Quận 1, TP.HCM",
+                                            "phuongthucthanhtoan": "cod",
+                                            "trangthaithanhtoan": "chua_thanh_toan",
+                                            "ghichu": "Giao hàng vào buổi chiều",
+                                            "user": {
+                                                "id": 1,
+                                                "name": "Nguyễn Văn A",
+                                                "email": "nguyenvana@email.com"
+                                            },
+                                            "chi_tiet_don_hang": [
+                                                {
+                                                    "id": 1,
+                                                    "tensanpham": "Áo thun nam",
+                                                    "dongia": 250000,
+                                                    "soluong": 2,
+                                                    "thanhtien": 500000,
+                                                    "chi_tiet_san_pham": {
+                                                        "id": 1,
+                                                        "tenSp": "Áo thun nam - Đỏ - M",
+                                                        "gia": 250000,
+                                                        "gia_khuyenmai": 200000,
+                                                        "mausac": {
+                                                            "id": 1,
+                                                            "tenMau": "Đỏ"
+                                                        },
+                                                        "size": {
+                                                            "id": 1,
+                                                            "tenSize": "M"
+                                                        }
+                                                    }
+                                                }
+                                            ],
+                                            "vouchers": [
+                                                {
+                                                    "id": 1,
+                                                    "ma_voucher": "GIAM10",
+                                                    "ten_voucher": "Giảm 10%",
+                                                    "gia_tri": 10,
+                                                    "loai_giam_gia": "phan_tram"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "pagination": {
+                                        "current_page": 1,
+                                        "per_page": 10,
+                                        "total": 25,
+                                        "last_page": 3,
+                                        "prev_page": null,
+                                        "next_page": 2,
+                                        "prev_url": null,
+                                        "next_url": "http://localhost/duan/duan/duantotnghiep/public/api/orders?page=2"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Lỗi validation hoặc không tìm thấy kết quả"
+                    },
+                    "422": {
+                        "description": "Dữ liệu không hợp lệ"
+                    },
+                    "500": {
+                        "description": "Lỗi server"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "5. Orders"
+                ],
+                "summary": "Tạo đơn hàng mới",
+                "description": "API này tạo đơn hàng mới với các sản phẩm và voucher (nếu có)",
+                "operationId": "createOrder",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_user",
+                                    "chi_tiet_don_hang",
+                                    "hoten",
+                                    "email",
+                                    "sodienthoai",
+                                    "diachigiaohang"
+                                ],
+                                "properties": {
+                                    "id_user": {
+                                        "description": "ID khách hàng",
+                                        "type": "integer"
+                                    },
+                                    "hoten": {
+                                        "description": "Họ tên người nhận",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "Email người nhận",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "sodienthoai": {
+                                        "description": "Số điện thoại người nhận",
+                                        "type": "string"
+                                    },
+                                    "diachigiaohang": {
+                                        "description": "Địa chỉ giao hàng",
+                                        "type": "string"
+                                    },
+                                    "phuongthucthanhtoan": {
+                                        "description": "Phương thức thanh toán",
+                                        "type": "string",
+                                        "enum": [
+                                            "cod",
+                                            "banking",
+                                            "momo",
+                                            "zalopay"
+                                        ]
+                                    },
+                                    "ghichu": {
+                                        "description": "Ghi chú đơn hàng",
+                                        "type": "string"
+                                    },
+                                    "chi_tiet_don_hang": {
+                                        "description": "Chi tiết sản phẩm trong đơn hàng",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id_chitietsanpham": {
+                                                    "description": "ID chi tiết sản phẩm",
+                                                    "type": "integer"
+                                                },
+                                                "soluong": {
+                                                    "description": "Số lượng",
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "dongia": {
+                                                    "description": "Đơn giá (tùy chọn, lấy từ chi tiết sản phẩm nếu không có)",
+                                                    "type": "number"
+                                                },
+                                                "ghichu": {
+                                                    "description": "Ghi chú cho sản phẩm này",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "vouchers": {
+                                        "description": "Danh sách voucher áp dụng (tùy chọn)",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id_voucher": {
+                                                    "description": "ID voucher",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tạo đơn hàng thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 201,
+                                    "message": "Tạo đơn hàng thành công",
+                                    "data": {
+                                        "id": 1,
+                                        "id_user": 1,
+                                        "trangthai": "cho_xac_nhan",
+                                        "ngaytao": "2024-01-15T10:30:00.000000Z",
+                                        "tongtien": 500000,
+                                        "hoten": "Nguyễn Văn A",
+                                        "email": "nguyenvana@email.com"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Dữ liệu không hợp lệ"
+                    },
+                    "500": {
+                        "description": "Lỗi server"
+                    }
+                }
+            }
+        },
+        "/api/orders/{id}": {
+            "get": {
+                "tags": [
+                    "5. Orders"
+                ],
+                "summary": "Chi tiết đơn hàng",
+                "description": "API này trả về thông tin chi tiết của một đơn hàng",
+                "operationId": "getOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID đơn hàng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "message": "Lấy thông tin đơn hàng thành công",
+                                    "data": {
+                                        "id": 1,
+                                        "id_user": 1,
+                                        "trangthai": "cho_xac_nhan",
+                                        "trangthai_text": "Chờ xác nhận",
+                                        "ngaytao": "2024-01-15T10:30:00.000000Z",
+                                        "ngaythanhtoan": null,
+                                        "tongtien": 500000,
+                                        "tongtien_formatted": "500.000 VNĐ",
+                                        "hoten": "Nguyễn Văn A",
+                                        "email": "nguyenvana@email.com",
+                                        "sodienthoai": "0123456789",
+                                        "diachigiaohang": "123 Đường ABC, Quận 1, TP.HCM",
+                                        "phuongthucthanhtoan": "cod",
+                                        "trangthaithanhtoan": "chua_thanh_toan",
+                                        "ghichu": "Giao hàng vào buổi chiều",
+                                        "user": {
+                                            "id": 1,
+                                            "name": "Nguyễn Văn A",
+                                            "email": "nguyenvana@email.com"
+                                        },
+                                        "chi_tiet_don_hang": [
+                                            {
+                                                "id": 1,
+                                                "tensanpham": "Áo thun nam",
+                                                "dongia": 250000,
+                                                "soluong": 2,
+                                                "thanhtien": 500000,
+                                                "chi_tiet_san_pham": {
+                                                    "id": 1,
+                                                    "tenSp": "Áo thun nam - Đỏ - M",
+                                                    "gia": 250000,
+                                                    "gia_khuyenmai": 200000,
+                                                    "mausac": {
+                                                        "id": 1,
+                                                        "tenMau": "Đỏ"
+                                                    },
+                                                    "size": {
+                                                        "id": 1,
+                                                        "tenSize": "M"
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "vouchers": [
+                                            {
+                                                "id": 1,
+                                                "ma_voucher": "GIAM10",
+                                                "ten_voucher": "Giảm 10%",
+                                                "gia_tri": 10,
+                                                "loai_giam_gia": "phan_tram"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Không tìm thấy đơn hàng"
+                    },
+                    "422": {
+                        "description": "ID không hợp lệ"
+                    },
+                    "500": {
+                        "description": "Lỗi server"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "5. Orders"
+                ],
+                "summary": "Cập nhật đơn hàng",
+                "description": "API này cập nhật thông tin đơn hàng (chủ yếu là trạng thái và thông tin giao hàng)",
+                "operationId": "updateOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID đơn hàng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "trangthai": {
+                                        "description": "Trạng thái đơn hàng",
+                                        "type": "string",
+                                        "enum": [
+                                            "cho_xac_nhan",
+                                            "da_xac_nhan",
+                                            "dang_giao",
+                                            "da_giao",
+                                            "da_huy",
+                                            "hoan_tra"
+                                        ]
+                                    },
+                                    "hoten": {
+                                        "description": "Họ tên người nhận",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "Email người nhận",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "sodienthoai": {
+                                        "description": "Số điện thoại người nhận",
+                                        "type": "string"
+                                    },
+                                    "diachigiaohang": {
+                                        "description": "Địa chỉ giao hàng",
+                                        "type": "string"
+                                    },
+                                    "phuongthucthanhtoan": {
+                                        "description": "Phương thức thanh toán",
+                                        "type": "string",
+                                        "enum": [
+                                            "cod",
+                                            "banking",
+                                            "momo",
+                                            "zalopay"
+                                        ]
+                                    },
+                                    "trangthaithanhtoan": {
+                                        "description": "Trạng thái thanh toán",
+                                        "type": "string",
+                                        "enum": [
+                                            "chua_thanh_toan",
+                                            "da_thanh_toan",
+                                            "hoan_tien"
+                                        ]
+                                    },
+                                    "ghichu": {
+                                        "description": "Ghi chú đơn hàng",
+                                        "type": "string"
+                                    },
+                                    "nhanvien": {
+                                        "description": "Tên nhân viên xử lý",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cập nhật đơn hàng thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "message": "Cập nhật đơn hàng thành công",
+                                    "data": {
+                                        "id": 1,
+                                        "trangthai": "da_xac_nhan",
+                                        "trangthai_text": "Đã xác nhận",
+                                        "ngaytao": "2024-01-15T10:30:00.000000Z",
+                                        "tongtien": 500000
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Không tìm thấy đơn hàng"
+                    },
+                    "422": {
+                        "description": "Dữ liệu không hợp lệ"
+                    },
+                    "500": {
+                        "description": "Lỗi server"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "5. Orders"
+                ],
+                "summary": "Xóa đơn hàng",
+                "description": "API này xóa đơn hàng (soft delete)",
+                "operationId": "deleteOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID đơn hàng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Xóa đơn hàng thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "message": "Xóa đơn hàng thành công"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Không tìm thấy đơn hàng"
+                    },
+                    "422": {
+                        "description": "ID không hợp lệ"
+                    },
+                    "500": {
+                        "description": "Lỗi server"
+                    }
+                }
+            }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "4. Products"
+                ],
+                "summary": "Danh sách sản phẩm (có phân trang)",
+                "description": "API này trả về danh sách sản phẩm với phân trang và các bộ lọc. Hỗ trợ tìm kiếm theo tên, mã sản phẩm, mô tả.",
+                "operationId": "getProducts",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo tên, mã sản phẩm, mô tả",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Trang hiện tại",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Số bản ghi mỗi trang",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái: 0=ngừng kinh doanh, 1=kinh doanh",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "ID danh mục sản phẩm",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "description": "Giá tối thiểu",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "description": "Giá tối đa",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "maSP": "SP001",
+                                            "tenSP": "Áo thun nam",
+                                            "id_danhmuc": 1,
+                                            "moTa": "Áo thun chất lượng cao",
+                                            "trangthai": true,
+                                            "base_price": 150000,
+                                            "base_sale_price": 120000,
+                                            "danhmuc": {
+                                                "id": 1,
+                                                "name": "Áo thun"
+                                            },
+                                            "hinhanh": [],
+                                            "chitietsanpham": [],
+                                            "created_at": "2024-01-01T00:00:00.000000Z",
+                                            "updated_at": "2024-01-01T00:00:00.000000Z"
+                                        }
+                                    ],
+                                    "pagination": {
+                                        "current_page": 1,
+                                        "per_page": 10,
+                                        "total": 1,
+                                        "last_page": 1
+                                    },
+                                    "message": "Lấy danh sách sản phẩm thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Có lỗi xảy ra"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "4. Products"
+                ],
+                "summary": "Tạo mới sản phẩm",
+                "operationId": "6e243e8a40d71450f1f106e42ebb9d76",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {},
+                            "example": {
+                                "maSP": "SP001",
+                                "tenSP": "Áo thun nam",
+                                "id_danhmuc": 1,
+                                "moTa": "Áo thun chất lượng cao",
+                                "trangthai": 1,
+                                "base_price": 150000,
+                                "base_sale_price": 120000,
+                                "variants": [
+                                    {
+                                        "ten": "Áo thun nam - Đỏ",
+                                        "mausac": 1,
+                                        "sizes": [
+                                            {
+                                                "size": 1,
+                                                "so_luong": 50,
+                                                "gia": 150000,
+                                                "gia_khuyenmai": 120000
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tạo mới thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo sản phẩm thành công"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 409
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Mã sản phẩm đã tồn tại"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products/{id}": {
+            "get": {
+                "tags": [
+                    "4. Products"
+                ],
+                "summary": "Chi tiết sản phẩm",
+                "operationId": "e3ebdc71dd45bcbfc0137a33c58ae422",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID sản phẩm",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lấy thông tin sản phẩm thành công"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy sản phẩm"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "4. Products"
+                ],
+                "summary": "Cập nhật sản phẩm",
+                "operationId": "db7d6b0e1397053fd4ab2047bca446bb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID sản phẩm",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {},
+                            "example": {
+                                "maSP": "SP001",
+                                "tenSP": "Áo thun nam cập nhật",
+                                "id_danhmuc": 1,
+                                "moTa": "Áo thun chất lượng cao - đã cập nhật",
+                                "trangthai": 1,
+                                "base_price": 160000,
+                                "base_sale_price": 130000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cập nhật thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": {
+                                        "id": 1,
+                                        "maSP": "SP001",
+                                        "tenSP": "Áo thun nam cập nhật",
+                                        "id_danhmuc": 1,
+                                        "moTa": "Áo thun chất lượng cao - đã cập nhật",
+                                        "trangthai": true,
+                                        "base_price": 160000,
+                                        "base_sale_price": 130000,
+                                        "created_at": "2024-01-01T00:00:00.000000Z",
+                                        "updated_at": "2024-01-01T00:00:00.000000Z"
+                                    },
+                                    "message": "Cập nhật sản phẩm thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dữ liệu không hợp lệ"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "4. Products"
+                ],
+                "summary": "Xóa sản phẩm mềm",
+                "operationId": "60e9f0b40dfa3839a24fb67ebf8c6837",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID sản phẩm",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Xóa thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Xóa sản phẩm thành công"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dữ liệu không hợp lệ"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products/{id}/restore": {
+            "post": {
+                "tags": [
+                    "4. Products"
+                ],
+                "summary": "Khôi phục sản phẩm đã xóa mềm",
+                "operationId": "b1217e1a2a7b6788e20684b9e5ad0a8b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID sản phẩm",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Khôi phục thành công"
+                    },
+                    "404": {
+                        "description": "Không tìm thấy sản phẩm"
+                    }
+                }
+            }
+        },
+        "/api/products/{id}/force": {
+            "delete": {
+                "tags": [
+                    "4. Products"
+                ],
+                "summary": "Xóa vĩnh viễn sản phẩm",
+                "operationId": "c150c0439ec84c1a9c761ab699af9703",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID sản phẩm",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Xóa vĩnh viễn thành công"
+                    },
+                    "404": {
+                        "description": "Không tìm thấy sản phẩm"
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "2. Users"
+                ],
+                "summary": "Danh sách người dùng (có phân trang)",
+                "description": "API này trả về danh sách người dùng với phân trang và các bộ lọc. Hỗ trợ tìm kiếm theo tên, email, số điện thoại.",
+                "operationId": "getUsers",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo tên, email, số điện thoại",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Trang hiện tại",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Số bản ghi mỗi trang",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái: 0=không hoạt động, 1=hoạt động",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "Vai trò: 1=Quản trị, 2=Cộng tác viên",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                1,
+                                2
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "name": "Nguyễn Văn A",
+                                            "email": "nguyenvana@example.com",
+                                            "phone": "0123456789",
+                                            "address": "123 Đường ABC, Quận 1, TP.HCM",
+                                            "province_id": 79,
+                                            "district_id": 761,
+                                            "ward_id": 26782,
+                                            "status": 1,
+                                            "user_catalogue_id": 2,
+                                            "created_at": "2024-01-01T00:00:00.000000Z",
+                                            "updated_at": "2024-01-01T00:00:00.000000Z"
+                                        }
+                                    ],
+                                    "pagination": {
+                                        "current_page": 1,
+                                        "per_page": 10,
+                                        "total": 1,
+                                        "last_page": 1
+                                    },
+                                    "message": "Lấy danh sách người dùng thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Có lỗi xảy ra"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "2. Users"
+                ],
+                "summary": "Tạo mới người dùng",
+                "operationId": "88ac51e048bd17c93b767194a54cde27",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {},
+                            "example": {
+                                "name": "Nguyễn Văn A",
+                                "email": "a@example.com",
+                                "password": "matkhau@123",
+                                "phone": "0901234567",
+                                "image": "avatar.jpg",
+                                "address": "123 Đường ABC",
+                                "province_id": 79,
+                                "district_id": 760,
+                                "ward_id": 26734,
+                                "birthday": "2000-01-01",
+                                "description": "Ghi chú",
+                                "status": 1,
+                                "user_catalogue_id": 2
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tạo mới thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo người dùng thành công"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 409
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không thể xóa người dùng vì đang được tham chiếu ở dữ liệu khác (ví dụ: đơn hàng)."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{id}": {
+            "get": {
+                "tags": [
+                    "2. Users"
+                ],
+                "summary": "Chi tiết người dùng",
+                "operationId": "868f915407b1fd55a92469e5a7e6b901",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID người dùng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lấy thông tin người dùng thành công"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 409
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không thể xóa người dùng vì đang được tham chiếu"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "2. Users"
+                ],
+                "summary": "Cập nhật người dùng",
+                "operationId": "10ddff7e1d52fbba3d05b76f83bf7013",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID người dùng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "user_catalogue_id"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 6
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "description": "Cho phép tên file; API sẽ build URL",
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "province_id": {
+                                        "type": "integer"
+                                    },
+                                    "district_id": {
+                                        "type": "integer"
+                                    },
+                                    "ward_id": {
+                                        "type": "integer"
+                                    },
+                                    "birthday": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ]
+                                    },
+                                    "user_catalogue_id": {
+                                        "type": "integer",
+                                        "enum": [
+                                            1,
+                                            2
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "name": "Nguyễn Văn Example",
+                                "email": "user@example.com",
+                                "password": "Matkhau@123",
+                                "phone": "0379559690",
+                                "image": "avatar.jpg",
+                                "address": "Quận 12, Hồ Chí Minh",
+                                "province_id": 82,
+                                "district_id": 824,
+                                "ward_id": 28735,
+                                "birthday": "2002-10-16",
+                                "description": "Thêm mô tả",
+                                "status": 0,
+                                "user_catalogue_id": 1
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cập nhật thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": {
+                                        "id": 88,
+                                        "name": "Đỗ Văn Nam",
+                                        "email": "nam.do@gmail.com",
+                                        "phone": "0905123456",
+                                        "image": "http://localhost/duan/duan/duantotnghiep/public/uploads/avatars/1755724419_68a63a836c6f1.jpg",
+                                        "status": 1,
+                                        "role": 2,
+                                        "province_id": 48,
+                                        "district_id": 492,
+                                        "ward_id": 20233,
+                                        "address": "67 Bạch Đằng",
+                                        "birthday": "1997-07-12 00:00:00",
+                                        "description": "Thành viên mới",
+                                        "created_at": "2025-08-20T21:13:39.000000Z",
+                                        "updated_at": "2025-08-20T21:13:39.000000Z"
+                                    },
+                                    "message": "Cập nhật người dùng thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dữ liệu không hợp lệ"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "2. Users"
+                ],
+                "summary": "Xóa người dùng",
+                "operationId": "f546937609b8589e34e3d2c7056428df",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID người dùng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Xóa thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Xóa người dùng thành công"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dữ liệu không hợp lệ"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/vouchers": {
+            "get": {
+                "tags": [
+                    "6. Vouchers"
+                ],
+                "summary": "Danh sách voucher",
+                "operationId": "70d0bb0b3d7821c0bd607906f958a0d0",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo mã/tên voucher",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "all",
+                        "in": "query",
+                        "description": "Lấy tất cả thay vì phân trang",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Trang hiện tại",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Số bản ghi mỗi trang",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái: 0=tạm dừng, 1=hoạt động",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "discount_type",
+                        "in": "query",
+                        "description": "Loại giảm giá",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "phan_tram",
+                                "tien_mat"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "usable",
+                        "in": "query",
+                        "description": "Chỉ lấy voucher có thể sử dụng",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "ma_voucher": "GIAM10",
+                                            "ten_voucher": "Giảm 10%",
+                                            "loai_giam_gia": "phan_tram",
+                                            "gia_tri": "10.00",
+                                            "trang_thai": 1
+                                        }
+                                    ],
+                                    "pagination": null,
+                                    "message": "Lấy danh sách voucher thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Có lỗi xảy ra"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "6. Vouchers"
+                ],
+                "summary": "Tạo voucher",
+                "operationId": "0c4c13fe1d8387a29c3047dda0f9867f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {},
+                            "example": {
+                                "ma_voucher": "GIAM10",
+                                "ten_voucher": "Giảm 10%",
+                                "mota": "Voucher giảm 10%",
+                                "loai_giam_gia": "phan_tram",
+                                "gia_tri": "10.00",
+                                "gia_tri_toi_thieu": "100000.00",
+                                "gia_tri_toi_da": "50000.00",
+                                "so_luong": 100,
+                                "ngay_bat_dau": "2025-01-01 00:00:00",
+                                "ngay_ket_thuc": "2025-12-31 23:59:59",
+                                "trang_thai": 1
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tạo mới thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": {
+                                        "id": 10,
+                                        "ma_voucher": "GIAM10",
+                                        "ten_voucher": "Giảm 10%"
+                                    },
+                                    "message": "Tạo voucher thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi"
+                    }
+                }
+            }
+        },
+        "/api/vouchers/{id}": {
+            "get": {
+                "tags": [
+                    "6. Vouchers"
+                ],
+                "summary": "Chi tiết voucher",
+                "operationId": "d1627118fc207c6b2449b847a6e04a71",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": {
+                                        "id": 1,
+                                        "ma_voucher": "GIAM10",
+                                        "ten_voucher": "Giảm 10%",
+                                        "loai_giam_gia": "phan_tram",
+                                        "gia_tri": "10.00",
+                                        "trang_thai": 1
+                                    },
+                                    "message": "Lấy thông tin voucher thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "6. Vouchers"
+                ],
+                "summary": "Cập nhật voucher",
+                "operationId": "fd5bd3e134903d46bb8b57e075686670",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {},
+                            "example": {
+                                "ma_voucher": "GIAM10",
+                                "ten_voucher": "Giảm 10% 2025",
+                                "mota": "Voucher giảm 10% cập nhật",
+                                "loai_giam_gia": "phan_tram",
+                                "gia_tri": "10.00",
+                                "gia_tri_toi_thieu": "100000.00",
+                                "gia_tri_toi_da": "50000.00",
+                                "so_luong": 100,
+                                "ngay_bat_dau": "2025-01-01 00:00:00",
+                                "ngay_ket_thuc": "2025-12-31 23:59:59",
+                                "trang_thai": 1
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cập nhật thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "data": {
+                                        "id": 10,
+                                        "ma_voucher": "GIAM10",
+                                        "ten_voucher": "Giảm 10% 2025"
+                                    },
+                                    "message": "Cập nhật voucher thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "6. Vouchers"
+                ],
+                "summary": "Xóa voucher",
+                "operationId": "2cf1adca8b6f34d89054e60387617d27",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Xóa thành công",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status_code": 200,
+                                    "message": "Xóa voucher thành công"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Lỗi"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Nguyễn Văn A"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "a@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "0901234567"
+                    },
+                    "image": {
+                        "type": "string",
+                        "example": "https://.../avatar.jpg",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "example": 1
+                    },
+                    "role": {
+                        "type": "integer",
+                        "enum": [
+                            1,
+                            2
+                        ],
+                        "example": 2
+                    },
+                    "province_id": {
+                        "type": "integer",
+                        "example": 79,
+                        "nullable": true
+                    },
+                    "district_id": {
+                        "type": "integer",
+                        "example": 760,
+                        "nullable": true
+                    },
+                    "ward_id": {
+                        "type": "integer",
+                        "example": 26734,
+                        "nullable": true
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 ABC, Q1, HCM",
+                        "nullable": true
+                    },
+                    "birthday": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2000-01-01",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Ghi chú",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PaginationMeta": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 120
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 12
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "6. Vouchers",
+            "description": "Voucher management endpoints"
+        },
+        {
+            "name": "1. Location",
+            "description": "Location management endpoints"
+        },
+        {
+            "name": "2. Users",
+            "description": "User management endpoints"
+        },
+        {
+            "name": "3. Categories",
+            "description": "Category management endpoints"
+        },
+        {
+            "name": "4. Products",
+            "description": "Product management endpoints"
+        },
+        {
+            "name": "5. Orders",
+            "description": "Order management endpoints"
+        }
+    ],
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    }
+}

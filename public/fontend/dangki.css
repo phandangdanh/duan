@@ -1,0 +1,109 @@
+:root {
+  --vang: #f5c518;
+  --xam-nhat: #343a40;
+  --xam-vua: #6c757d;
+  --xam-nha: #f0f0f0;
+  --font-chinh: 'Poppins', sans-serif;
+  --font-tieu-de: 'Playfair Display', serif;
+}
+
+body {
+  background-color: var(--xam-nha);
+  font-family: var(--font-chinh);
+  color: var(--xam-nhat);
+}
+
+.form-box {
+  max-width: 500px;
+  margin: 4rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.logo-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.logo {
+  background-color: var(--vang);
+  color: var(--xam-nhat);
+  font-family: var(--font-tieu-de);
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+}
+
+h2 {
+  font-family: var(--font-tieu-de);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  font-weight: 600;
+}
+
+.btn-register {
+  background-color: var(--vang);
+  border: none;
+  color: var(--xam-nhat);
+  font-weight: 600;
+  width: 100%;
+}
+
+.btn-register:hover {
+  background-color: #e0be13;
+  color: var(--xam-nhat);
+}
+
+.btn-google {
+  width: 100%;
+  border: 1px solid #ccc;
+  background: var(--xam-vua);
+  color: white;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.btn-google img {
+  width: 20px;
+}
+
+.dang-nhap-link {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.dang-nhap-link a {
+  color: var(--xam-nhat);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+
+
+.btn-login {
+  background-color: var(--vang);
+  border: none;
+  color: var(--xam-nhat);
+  font-weight: 600;
+  width: 100%;
+}
+
+
+.btn-login:hover {
+  background-color: #e0be13;
+  color: var(--xam-nhat);
+}

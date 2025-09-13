@@ -1,0 +1,74 @@
+  nav.navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+  .banner-khuyen-mai {
+    z-index: 1050;
+  }
+
+  .banner-khuyen-mai img {
+    max-height: 90px;
+    object-fit: cover;
+  }
+ body {
+    font-family: 'Poppins', sans-serif;
+  }
+  .navbar {
+    background-color: #FFC107; /* Màu vàng */
+  }
+  .nav-link {
+    font-weight: 500;
+    color: #000 !important;
+  }
+  .nav-link:hover {
+    color: #fff !important;
+  }
+  .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #000 !important;
+  }
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #555;
+  }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+    }
+    .category-banner {
+      background: url('/img/banner-danhmuc.jpg') center/cover no-repeat;
+      height: 300px;
+      position: relative;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    }
+    .category-banner h1 {
+      font-weight: 700;
+      font-size: 3rem;
+    }
+    .product-card {
+      transition: 0.3s;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    .card-img-top {
+      height: 220px;
+      object-fit: cover;
+    }
+    .price {
+      color: #FFC107;
+      font-weight: 600;
+    }
+    .filter-box h5 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }

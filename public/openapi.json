@@ -1,0 +1,148 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "DuAnTotNghiep API",
+    "version": "1.0.0",
+    "description": "User management API with pagination"
+  },
+  "servers": [
+    { "url": "/duantotnghiep/public", "description": "Local" }
+  ],
+  "tags": [
+    { "name": "Users", "description": "User management endpoints" }
+  ],
+  "paths": {
+    "/api/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "List users",
+        "parameters": [
+          {"name":"page","in":"query","schema":{"type":"integer","minimum":1}},
+          {"name":"per_page","in":"query","schema":{"type":"integer","minimum":1,"maximum":100}},
+          {"name":"keyword","in":"query","schema":{"type":"string"}},
+          {"name":"status","in":"query","schema":{"type":"integer","enum":[0,1]}},
+          {"name":"role","in":"query","schema":{"type":"integer","enum":[1,2]},"description":"1=Admin, 2=Collaborator"}
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/User"}
+                    },
+                    "meta": {"$ref": "#/components/schemas/PaginationMeta"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name","email","password","user_catalogue_id"],
+                "properties": {
+                  "name": {"type":"string"},
+                  "email": {"type":"string","format":"email"},
+                  "password": {"type":"string","minLength":6},
+                  "phone": {"type":"string"},
+                  "image": {"type":"string"},
+                  "status": {"type":"integer","enum":[0,1]},
+                  "user_catalogue_id": {"type":"integer","enum":[1,2]}
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user",
+        "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"integer"}}],
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Not found" } }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update user",
+        "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"integer"}}],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {"type":"string"},
+                  "email": {"type":"string","format":"email"},
+                  "password": {"type":"string","minLength":6},
+                  "phone": {"type":"string"},
+                  "image": {"type":"string"},
+                  "status": {"type":"integer","enum":[0,1]},
+                  "user_catalogue_id": {"type":"integer","enum":[1,2]}
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Not found" } }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete user",
+        "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"integer"}}],
+        "responses": { "204": { "description": "No Content" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {"type":"integer"},
+          "name": {"type":"string"},
+          "email": {"type":"string","format":"email"},
+          "phone": {"type":"string"},
+          "image": {"type":"string","nullable":true},
+          "status": {"type":"integer","enum":[0,1]},
+          "role": {"type":"integer","enum":[1,2]},
+          "province_id": {"type":"integer","nullable":true},
+          "district_id": {"type":"integer","nullable":true},
+          "ward_id": {"type":"integer","nullable":true},
+          "address": {"type":"string","nullable":true},
+          "birthday": {"type":"string","format":"date","nullable":true},
+          "description": {"type":"string","nullable":true},
+          "created_at": {"type":"string","format":"date-time"},
+          "updated_at": {"type":"string","format":"date-time"}
+        }
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "current_page": {"type":"integer"},
+          "per_page": {"type":"integer"},
+          "total": {"type":"integer"},
+          "last_page": {"type":"integer"}
+        }
+      }
+    }
+  }
+}
+
+{
+    "openapi": "3.0.0"
+}

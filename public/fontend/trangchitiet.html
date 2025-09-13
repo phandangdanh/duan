@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ThriftZone - Thời Trang Secondhand</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400&display=swap"
+    rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="trangchu.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    nav.navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+  .banner-khuyen-mai {
+    z-index: 1050;
+  }
+
+  .banner-khuyen-mai img {
+    max-height: 90px;
+    object-fit: cover;
+  }
+
+  </style>
+</head>
+
+<body>
+<section class="banner-khuyen-mai position-relative">
+  <img src="/img/6254356 (1).jpg" 
+       alt="Banner khuyến mãi" 
+       class="w-100 d-block" style="max-height: 180px; object-fit: cover;">
+
+  <!-- Nút đóng -->
+  <button class="btn-close position-absolute top-0 end-0 m-2" 
+          aria-label="Đóng" 
+          onclick="this.parentElement.style.display='none'">
+  </button>
+</section>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<!-- Google Font đẹp -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+  .navbar {
+    background-color: #FFC107; /* Màu vàng */
+  }
+  .nav-link {
+    font-weight: 500;
+    color: #000 !important;
+  }
+  .nav-link:hover {
+    color: #fff !important;
+  }
+  .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #000 !important;
+  }
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #555;
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg shadow-sm">
+  <div class="container">
+    <!-- Logo -->
+    <a class="navbar-brand" href="trangchu.html">ThriftZone</a>
+
+    <!-- Nút mobile toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-chinh">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Nội dung menu -->
+    <div class="collapse navbar-collapse" id="menu-chinh">
+      <!-- Menu trái -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="trangchu.html">Trang chủ</a></li>
+        <li class="nav-item"><a class="nav-link" href="gioithieu.html">Giới thiệu</a></li>
+        <li class="nav-item"><a class="nav-link" href="sanpham.html">Sản phẩm</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.html">Liên hệ</a></li>
+      </ul>
+
+      <!-- Search + Cart -->
+      <form class="d-flex align-items-center me-3 position-relative" role="search">
+        <input class="form-control me-2 ps-5" type="search" placeholder="Tìm kiếm..." aria-label="Search">
+        <i class="bi bi-search position-absolute" style="left: 15px; color: gray;"></i>
+        <a class="nav-link position-relative ms-2" href="giohang.html">
+          <i class="bi bi-bag" style="font-size: 1.5rem;"></i>
+          <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">0</span>
+        </a>
+      </form>
+
+      <!-- Đăng nhập / Đăng ký -->
+      <div class="d-flex">
+        <a href="dangnhap.html" class="btn btn-outline-dark me-2">Đăng nhập</a>
+        <a href="dangki.html" class="btn btn-dark">Đăng ký</a>
+      </div>
+    </div>
+  </div>
+</nav>
+  <style>
+    .thumbnail-img { width: 60px; height: 60px; object-fit: cover; cursor: pointer; border: 1px solid #ccc; margin-right: 8px; }
+    .thumbnail-img.active { border: 2px solid orange; }
+    .price-original { text-decoration: line-through; color: gray; }
+    .price-sale { font-size: 1.8rem; color: #d0021b; }
+    .product-options button.active { border: 2px solid orange; }
+    .product-options button { margin: 4px; }
+    .qty-input { width: 60px; }
+    .btn-buy-now { background-color: orange; color: white; }
+  </style>
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="row">
+    <!-- Hình ảnh -->
+    <div class="col-md-5">
+      <img id="main-image" src="/img/aosomi1.png" alt="Sản phẩm" class="img-fluid mb-3">
+      <div class="d-flex">
+        <img src="/img/aosomi1.png" class="thumbnail-img active" onclick="changeImage(this)">
+        <img src="/img/aosomi2.png" class="thumbnail-img" onclick="changeImage(this)">
+        <img src="/img/aosomi3.png" class="thumbnail-img" onclick="changeImage(this)">
+        <img src="/img/aosomi3.png" class="thumbnail-img" onclick="changeImage(this)">
+      </div>
+    </div>
+
+    <!-- Thông tin sản phẩm -->
+    <div class="col-md-7">
+      <h4>Áo Sơ Mi Nam Kẻ Sọc Đen Trắng 2025 Phong Cách Hàn Quốc</h4>
+      <div class="mb-2 text-warning">
+        ★★★★★ <span class="text-secondary">52 đánh giá</span>
+      </div>
+      <div class="mb-2">
+        <span class="price-sale">59.000₫</span>
+        <span class="price-original">104.000₫</span>
+        <span class="text-danger"> -43%</span>
+      </div>
+
+      <div class="alert alert-warning py-1 p    x-2 mb-2 d-inline-block">🌟 Mua sắm kết hợp thêm Siêu ưu đãi Thanh toán</div>
+
+      <!-- Chọn màu -->
+      <div class="mt-4">
+        <strong>Nhóm Màu: </strong>
+        <div class="product-options d-flex flex-wrap">
+          <button class="btn btn-outline-secondary active">Đen Trắng</button>
+          <button class="btn btn-outline-secondary">Đỏ</button>
+          <button class="btn btn-outline-secondary">Xanh Dương</button>
+          <button class="btn btn-outline-secondary">Trắng</button>
+        </div>
+      </div>
+
+      <!-- Chọn size -->
+      <div class="mt-3">
+        <strong>Size: </strong>
+        <div class="product-options d-flex flex-wrap">
+          <button class="btn btn-outline-secondary">M</button>
+          <button class="btn btn-outline-secondary active">L</button>
+          <button class="btn btn-outline-secondary">XL</button>
+          <button class="btn btn-outline-secondary">2XL</button>
+          <button class="btn btn-outline-secondary">3XL</button>
+        </div>
+      </div>
+
+      <!-- Chọn số lượng -->
+      <div class="mt-3 d-flex align-items-center">
+        <strong class="me-3">Số lượng:</strong>
+        <input type="number" class="form-control qty-input" min="1" value="1">
+      </div>
+
+      <!-- Nút hành động -->
+      <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-buy-now px-4">Mua ngay</button>
+      <button class="btn btn-outline-warning px-4"
+        onclick="themVaoGioHang()">
+  <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+</button>
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- PHẢN HỒI KHÁCH HÀNG -->
+      <div class="feedback-section mt-5 rounded">
+        <div class="container">
+          <h4 class="mb-4">Phản hồi từ khách hàng</h4>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="feedback-card">
+                <p>"Sản phẩm chất lượng, giao hàng nhanh. Mình sẽ tiếp tục ủng hộ!"</p>
+                <div class="text-warning">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-half"></i>
+                </div>
+                <small>- Minh Anh, Hà Nội</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="feedback-card">
+                <p>"Áo váy secondhand nhưng chất vải như mới. Màu sắc tươi và form đẹp."</p>
+                <div class="text-warning">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <small>- Thu Trang, Đà Nẵng</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="feedback-card">
+                <p>"Shop tư vấn nhiệt tình, đóng gói cẩn thận. Mình rất hài lòng."</p>
+                <div class="text-warning">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star"></i>
+                </div>
+                <small>- Đức Huy, TP.HCM</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+<script>
+  function changeImage(el) {
+    document.getElementById('main-image').src = el.src;
+    document.querySelectorAll('.thumbnail-img').forEach(img => img.classList.remove('active'));
+    el.classList.add('active');
+  }
+  
+</script>
+<script>
+  function themVaoGioHang() {
+    const sanPham = {
+      id: 1,
+      ten: "Áo Sơ Mi Nam Kẻ Sọc Đen Trắng",
+      gia: 59000,
+      soLuong: parseInt(document.querySelector('.qty-input').value),
+      hinhAnh: document.getElementById('main-image').src
+    };
+
+    let gioHang = JSON.parse(localStorage.getItem('gioHang')) || [];
+
+    // Kiểm tra nếu sản phẩm đã có thì tăng số lượng
+    const index = gioHang.findIndex(sp => sp.id === sanPham.id);
+    if (index !== -1) {
+      gioHang[index].soLuong += sanPham.soLuong;
+    } else {
+      gioHang.push(sanPham);
+    }
+
+    localStorage.setItem('gioHang', JSON.stringify(gioHang));
+    alert("Đã thêm vào giỏ hàng!");
+    capNhatSoLuongGio();
+  }
+
+  function capNhatSoLuongGio() {
+    const gioHang = JSON.parse(localStorage.getItem('gioHang')) || [];
+    const tong = gioHang.reduce((sum, sp) => sum + sp.soLuong, 0);
+    document.querySelector('.bi-bag + span').innerText = tong;
+  }
+
+  // Gọi khi trang vừa tải
+  capNhatSoLuongGio();
+</script>
+
+<footer class="bg-warning text-dark mt-5 pt-5 pb-4">
+  <div class="container text-md-left">
+    <div class="row">
+      <!-- Thông tin liên hệ -->
+      <div class="col-md-4 mb-4">
+        <h5 class="text-uppercase fw-bold mb-3">Thông tin liên hệ</h5>
+        <ul class="list-unstyled">
+          <li>Địa chỉ: TP.HCM</li>
+          <li>Email: support@thriftzone.vn</li>
+          <li>Điện thoại: 0909 123 456</li>
+        </ul>
+      </div>
+
+      <!-- Về ThriftZone -->
+      <div class="col-md-4 mb-4">
+        <h5 class="text-uppercase fw-bold mb-3">Về ThriftZone</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-dark text-decoration-none">Giới thiệu</a></li>
+          <li><a href="#" class="text-dark text-decoration-none">Chính sách đổi trả</a></li>
+          <li><a href="#" class="text-dark text-decoration-none">Hướng dẫn mua hàng</a></li>
+        </ul>
+      </div>
+
+      <!-- Hỗ trợ khách hàng -->
+      <div class="col-md-4 mb-4">
+        <h5 class="text-uppercase fw-bold mb-3">Hỗ trợ khách hàng</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-dark text-decoration-none">Liên hệ</a></li>
+          <li><a href="#" class="text-dark text-decoration-none">FAQ</a></li>
+          <li><a href="#" class="text-dark text-decoration-none">Phản hồi</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Dòng bản quyền -->
+    <div class="text-center pt-3 border-top border-dark mt-3">
+      © 2025 <strong>ThriftZone</strong> – All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

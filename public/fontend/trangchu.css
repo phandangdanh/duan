@@ -1,0 +1,326 @@
+   :root {
+      --vang: #f5c518;
+      --xam-nhat: #343a40;
+      --xam-vua: #6c757d;
+      --xam-nha: #f0f0f0;
+      --font-chinh: 'Poppins', sans-serif;
+      --font-tieu-de: 'Playfair Display', serif;
+    }
+
+    body {
+      background-color: var(--xam-nha);
+      font-family: var(--font-chinh);
+      color: var(--xam-nhat);
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: var(--vang);
+      padding: 1rem 2rem;
+      font-weight: 600;
+    }
+    .navbar-brand {
+      font-family: var(--font-tieu-de);
+      font-size: 1.8rem;
+      color: var(--xam-nhat);
+      letter-spacing: 1.5px;
+    }
+    .navbar-nav .nav-link {
+      color: var(--xam-nhat);
+      font-weight: 600;
+      transition: color 0.3s;
+      font-size: 1rem;
+    }
+    .navbar-nav .nav-link:hover {
+      color: #222;
+    }
+
+    .btn-auth {
+      border-radius: 25px;
+      font-weight: 600;
+      padding: 0.4rem 1.4rem;
+      transition: background-color 0.3s, color 0.3s;
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-block;
+      line-height: 1.5;
+    }
+    .btn-login {
+      background-color: transparent;
+      border: 2px solid var(--xam-nhat);
+      color: var(--xam-nhat);
+      margin-right: 1rem;
+    }
+    .btn-login:hover {
+      background-color: var(--xam-nhat);
+      color: var(--vang);
+      border-color: var(--xam-nhat);
+    }
+    .btn-register {
+      background-color: var(--vang);
+      border: none;
+      color: var(--xam-nhat);
+    }
+    .btn-register:hover {
+      background-color: #e0be13;
+      color: var(--xam-nhat);
+    }
+
+  
+    .gioi-thieu {
+      background: linear-gradient(135deg, var(--vang), #f3de55);
+      color: var(--xam-nhat);
+      text-align: center;
+      padding: 8rem 2rem 6rem;
+      font-family: var(--font-tieu-de);
+      letter-spacing: 1.5px;
+    }
+    .gioi-thieu h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      cursor: default;
+    }
+    .gioi-thieu h1:hover {
+      transform: scale(1.05) rotate(-1deg);
+    }
+    .gioi-thieu p {
+      font-size: 1.25rem;
+      font-weight: 400;
+      margin-bottom: 2rem;
+      font-family: var(--font-chinh);
+    }
+    .gioi-thieu .btn-primary {
+      font-size: 1.2rem;
+      padding: 0.75rem 2rem;
+      border-radius: 30px;
+      box-shadow: 0 8px 15px rgba(245, 197, 24, 0.4);
+      transition: box-shadow 0.3s ease;
+      font-weight: 600;
+      color: var(--xam-nhat);
+      background-color: white;
+      border: none;
+    }
+    .gioi-thieu .btn-primary:hover {
+      box-shadow: 0 12px 25px rgba(245, 197, 24, 0.7);
+      background-color: var(--vang);
+      color: var(--xam-nhat);
+    }
+
+    .danh-muc-noi-bat {
+      padding: 4rem 2rem;
+      background-color: white;
+      text-align: center;
+    }
+    .danh-muc-noi-bat h2 {
+      font-family: var(--font-tieu-de);
+      font-weight: 700;
+      margin-bottom: 3rem;
+      font-size: 2.5rem;
+      color: var(--xam-nhat);
+    }
+    .muc-danh-muc {
+      background-color: var(--xam-nha);
+      border-radius: 12px;
+      padding: 2.5rem 1.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--xam-nhat);
+      user-select: none;
+      box-shadow: 0 3px 7px rgb(0 0 0 / 0.07);
+    }
+    .muc-danh-muc:hover {
+      background-color: var(--vang);
+      color: var(--xam-nhat);
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 6px 14px rgb(0 0 0 / 0.15);
+    }
+
+
+    .san-pham-noi-bat {
+      background-color: var(--xam-nha);
+      padding: 4rem 2rem;
+    }
+    .san-pham-noi-bat h2 {
+      font-family: var(--font-tieu-de);
+      font-weight: 700;
+      margin-bottom: 3rem;
+      font-size: 2.5rem;
+      color: var(--xam-nhat);
+      text-align: center;
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgb(0 0 0 / 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 15px 35px rgb(0 0 0 / 0.2);
+    }
+    .card img {
+      border-radius: 15px 15px 0 0;
+      object-fit: cover;
+      height: 230px;
+      width: 100%;
+    }
+    .card-body {
+      padding: 1rem 1.5rem;
+      font-family: var(--font-chinh);
+      color: var(--xam-nhat);
+    }
+    .card-title {
+      font-family: var(--font-tieu-de);
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-text {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      color: var(--xam-vua);
+    }
+    .btn-buy {
+      background-color: var(--vang);
+      border: none;
+      color: var(--xam-nhat);
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 0.5rem 1.8rem;
+      transition: background-color 0.3s;
+    }
+    .btn-buy:hover {
+      background-color: #e0be13;
+      color: var(--xam-nhat);
+    }
+
+ 
+    .phan-hoi-khach-hang {
+      padding: 4rem 2rem;
+      background: white;
+      text-align: center;
+    }
+    .phan-hoi-khach-hang h2 {
+      font-family: var(--font-tieu-de);
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      color: var(--xam-nhat);
+    }
+    .item-phan-hoi {
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgb(0 0 0 / 0.1);
+      border-radius: 15px;
+      margin-bottom: 2rem;
+      background-color: var(--xam-nha);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1.1rem;
+      color: var(--xam-vua);
+      position: relative;
+    }
+    .item-phan-hoi::before {
+      content: "“";
+      font-size: 3rem;
+      position: absolute;
+      top: -20px;
+      left: 20px;
+      color: var(--vang);
+      font-weight: 700;
+    }
+    .nguoi-danh-gia {
+      margin-top: 1rem;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--xam-nhat);
+      text-align: right;
+    }
+
+ 
+    footer {
+      background-color: var(--vang);
+      color: var(--xam-nhat);
+      padding: 3rem 2rem;
+      font-family: var(--font-chinh);
+      font-size: 0.9rem;
+    }
+    .phan-chu-footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .phan-chu-footer-muc {
+      flex: 1 1 200px;
+      min-width: 180px;
+    }
+    .phan-chu-footer h5 {
+      font-family: var(--font-tieu-de);
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      color: var(--xam-nhat);
+    }
+    .phan-chu-footer ul {
+      list-style: none;
+      padding: 0;
+    }
+    .phan-chu-footer ul li {
+      margin-bottom: 0.8rem;
+      color: var(--xam-nhat);
+      cursor: pointer;
+      transition: color 0.3s;
+      font-weight: 600;
+    }
+    .phan-chu-footer ul li:hover {
+      color: #444;
+    }
+    .ban-quyen {
+      text-align: center;
+      margin-top: 2rem;
+      font-style: italic;
+      color: var(--xam-nhat);
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 767px) {
+      .phan-chu-footer {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .phan-chu-footer-muc {
+        min-width: 100%;
+      }
+      .gioi-thieu h1 {
+        font-size: 2.6rem;
+      }
+      .gioi-thieu p {
+        font-size: 1rem;
+      }
+      .san-pham-noi-bat h2,
+      .danh-muc-noi-bat h2,
+      .phan-hoi-khach-hang h2 {
+        font-size: 2rem;
+      }
+      .muc-danh-muc {
+        font-size: 1.1rem;
+        padding: 2rem 1rem;
+      }
+      .card img {
+        height: 200px;
+      }
+    }

@@ -1,0 +1,519 @@
+/* ========================================
+   VOUCHER MANAGEMENT CSS - CLEAN VERSION
+   ======================================== */
+
+/* IMPORTANT: Override all conflicting styles */
+.voucher-stats {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.voucher-stats * {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Font Awesome 5 Icons */
+.fas, .far, .fal, .fab {
+    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+.fab {
+    font-family: "Font Awesome 5 Brands" !important;
+    font-weight: 400 !important;
+}
+
+.far {
+    font-weight: 400 !important;
+}
+
+.fal {
+    font-weight: 300 !important;
+}
+
+/* Summary Cards */
+.voucher-stats .stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-height: 140px;
+}
+
+.voucher-stats .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    z-index: 1;
+}
+
+.voucher-stats .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.voucher-stats .card-body {
+    position: relative;
+    z-index: 2;
+    padding: 25px !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: visible;
+}
+
+.voucher-stats .row.no-gutters {
+    margin: 0 !important;
+    height: 100%;
+    align-items: center;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+}
+
+.voucher-stats .row.no-gutters .col {
+    flex: 1;
+    padding: 0 15px;
+}
+
+.voucher-stats .row.no-gutters .col-auto {
+    flex: 0 0 auto;
+    padding: 0 15px;
+}
+
+/* Text Styles - HIGH SPECIFICITY */
+.voucher-stats .card-body .row.no-gutters .col.mr-2 .text-xs {
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
+    color: white !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 15px !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    line-height: 1.2 !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.voucher-stats .text-xs {
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
+    color: white !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 15px !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    line-height: 1.2 !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.voucher-stats .card-body .row.no-gutters .col.mr-2 .h5 {
+    font-size: 3.5rem !important;
+    font-weight: 900 !important;
+    color: white !important;
+    margin: 0 !important;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.4) !important;
+    line-height: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.voucher-stats .h5 {
+    font-size: 3.5rem !important;
+    font-weight: 900 !important;
+    color: white !important;
+    margin: 0 !important;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.4) !important;
+    line-height: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.voucher-stats .card-body .row.no-gutters .col-auto i {
+    font-size: 3.5rem !important;
+    color: rgba(255,255,255,0.9) !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.voucher-stats .col-auto i {
+    font-size: 3.5rem !important;
+    color: rgba(255,255,255,0.9) !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.voucher-stats .col-auto {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Different Colors for Each Card - Four Distinct Colors */
+.voucher-stats .stat-card:nth-child(1) {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* Deep Purple to Blue */
+}
+
+.voucher-stats .stat-card:nth-child(2) {
+    background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%); /* Orange to Pink */
+}
+
+.voucher-stats .stat-card:nth-child(3) {
+    background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); /* Teal to Lime Green */
+}
+
+.voucher-stats .stat-card:nth-child(4) {
+    background: linear-gradient(135deg, #f7797d 0%, #fbd786 100%); /* Coral to Light Yellow */
+}
+
+/* Action Buttons */
+.action-buttons .btn {
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.action-buttons .btn-primary {
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    border: none;
+    box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+}
+
+.action-buttons .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(106, 17, 203, 0.6);
+}
+
+.action-buttons .btn-info {
+    background: linear-gradient(45deg, #00b09b, #96c93d);
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4);
+}
+
+.action-buttons .btn-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 176, 155, 0.6);
+}
+
+/* Filter Section */
+.voucher-filter {
+    background: white url('/backend/images/pattern-2.png') center/cover no-repeat;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.voucher-filter .form-control,
+.voucher-filter .form-select {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 12px 15px;
+    height: 45px;
+    transition: all 0.3s ease;
+}
+
+.voucher-filter .form-control:focus,
+.voucher-filter .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Table Styles */
+.voucher-table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.voucher-table thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #2c3e50 !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 15px;
+    border: none;
+    font-size: 0.9rem;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.voucher-table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f8f9fa;
+    overflow: visible;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.voucher-table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.01);
+    transition: all 0.3s ease;
+}
+
+/* Badge Styles */
+.badge {
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-primary {
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    color: white;
+}
+
+.badge-success {
+    background: linear-gradient(45deg, #00b09b, #96c93d);
+    color: white;
+}
+
+.badge-info {
+    background: linear-gradient(45deg, #ff6a00, #ee0979);
+    color: white;
+}
+
+.badge-warning {
+    background: linear-gradient(45deg, #f7797d, #fbd786);
+    color: white;
+}
+
+/* Progress Bar */
+.progress {
+    height: 8px;
+    border-radius: 10px;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    background: linear-gradient(45deg, #00b09b, #96c93d);
+}
+
+/* Time Remaining */
+.voucher-time-remaining {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    padding: 15px;
+    border-left: 4px solid #6a11cb;
+    margin-top: 10px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: visible;
+}
+
+.voucher-time-remaining div {
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.voucher-time-remaining strong {
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.voucher-time-remaining small {
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 25px;
+    display: inline-block;
+    margin-top: 10px;
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    color: white;
+    text-align: center;
+    min-width: 160px;
+    box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+}
+
+/* Action Buttons in Table */
+.voucher-actions .btn {
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 0 2px;
+    transition: all 0.3s ease;
+}
+
+.voucher-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Activate/Deactivate buttons */
+.btn-activate {
+    background: linear-gradient(45deg, #00b09b, #96c93d);
+    color: #fff;
+    border: none;
+}
+
+.btn-deactivate {
+    background: linear-gradient(45deg, #6c757d, #495057);
+    color: #fff;
+    border: none;
+}
+
+/* SweetAlert2 button custom styles */
+.swal2-confirm-rounded,
+.swal2-cancel-rounded {
+    border-radius: 25px !important;
+    padding: 8px 18px !important;
+    font-weight: 700 !important;
+}
+
+.swal2-confirm-danger {
+    background: linear-gradient(45deg, #dc3545, #c82333) !important;
+}
+
+/* Hide all checkboxes in voucher page */
+input[type="checkbox"],
+.form-check-input,
+.custom-control-input,
+.card-body input[type="checkbox"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Force all elements to be visible except checkboxes */
+.voucher-stats *:not(input[type="checkbox"]):not(.form-check-input):not(.custom-control-input) {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Ensure text and numbers are visible */
+.voucher-stats .col {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.voucher-stats .col.mr-2 {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.voucher-stats .mb-1 {
+    margin-bottom: 0.5rem !important;
+}
+
+.voucher-stats .mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.voucher-stats .row {
+    display: flex !important;
+}
+
+.voucher-stats .col {
+    display: block !important;
+}
+
+.voucher-table * {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.voucher-table thead th {
+    display: table-cell !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: white !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 15px !important;
+    border: none !important;
+    font-size: 0.9rem !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.voucher-table thead tr {
+    display: table-row !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.voucher-table thead {
+    display: table-header-group !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .voucher-stats .stat-card {
+        margin-bottom: 20px;
+    }
+    
+    .voucher-stats .h5 {
+        font-size: 2rem;
+    }
+    
+    .voucher-stats .text-xs {
+        font-size: 0.9rem;
+    }
+}

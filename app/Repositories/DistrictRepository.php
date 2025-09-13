@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Repositories\Interfaces\DistrictRepositoryInterface;
+use App\Models\District;
+use App\Repositories\BaseRepository;
+
+/**
+ * Class DistrictService
+ * @package App\Services
+ */
+class DistrictRepository extends BaseRepository implements DistrictRepositoryInterface
+{
+    protected $model;
+
+    public function __construct(District $model)
+    {
+        $this->model = $model;
+    }
+    public function getByProvinceId(int $provinceId = 0)
+    {
+        return $this->model->where('province_code', '=', $provinceId)->get();
+    }
+}

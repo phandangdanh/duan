@@ -1,0 +1,164 @@
+/* ========================================
+   CATEGORY MANAGEMENT CSS (DANH MUC)
+   ======================================== */
+
+/* Category Filter Section */
+.danhmuc-filter .form-control {
+    height: 45px !important;
+    padding: 8px 12px !important;
+}
+
+.danhmuc-filter select {
+    padding-right: 25px !important;
+    background-position: right 8px center !important;
+}
+
+.danhmuc-filter input[type="text"] {
+    height: 45px !important;
+}
+
+/* Category Table */
+.danhmuc-table td {
+    vertical-align: middle !important;
+    padding: 12px 8px !important;
+}
+
+.danhmuc-table .btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Category Name Display */
+.danhmuc-name {
+    font-weight: 500;
+    color: #212529;
+}
+
+.danhmuc-name:hover {
+    color: #007bff;
+    text-decoration: none;
+}
+
+/* Category Description */
+.danhmuc-description {
+    font-size: 0.9rem;
+    color: #6c757d;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Category Status Badges */
+.danhmuc-status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.danhmuc-status-badge.status-active {
+    background-color: #28a745;
+    color: white;
+}
+
+.danhmuc-status-badge.status-inactive {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Category Sort Order */
+.danhmuc-sort-order {
+    font-weight: bold;
+    color: #007bff;
+    text-align: center;
+}
+
+/* Category Product Count */
+.danhmuc-product-count {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+}
+
+/* Category Action Buttons */
+.danhmuc-actions {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.danhmuc-actions .btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.danhmuc-actions .btn {
+    margin: 0 2px;
+}
+
+/* Category Statistics Cards */
+.danhmuc-stats .card-body {
+    padding: 1rem !important;
+}
+
+.danhmuc-stats .text-xs {
+    line-height: 1.4 !important;
+    padding-top: 3px !important;
+    padding-bottom: 2px !important;
+}
+
+/* Category Tree Structure */
+.danhmuc-tree {
+    padding-left: 20px;
+}
+
+.danhmuc-tree-level-1 {
+    padding-left: 0;
+}
+
+.danhmuc-tree-level-2 {
+    padding-left: 20px;
+}
+
+.danhmuc-tree-level-3 {
+    padding-left: 40px;
+}
+
+.danhmuc-tree-icon {
+    margin-right: 5px;
+    color: #6c757d;
+}
+
+/* Category Responsive */
+@media (max-width: 768px) {
+    .danhmuc-filter .col-md-2,
+    .danhmuc-filter .col-md-3 {
+        margin-bottom: 15px;
+    }
+    
+    .danhmuc-table {
+        font-size: 0.9rem;
+    }
+    
+    .danhmuc-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .danhmuc-description {
+        max-width: 150px;
+    }
+    
+    .danhmuc-tree {
+        padding-left: 10px;
+    }
+    
+    .danhmuc-tree-level-2 {
+        padding-left: 10px;
+    }
+    
+    .danhmuc-tree-level-3 {
+        padding-left: 20px;
+    }
+}
