@@ -29,8 +29,7 @@ Route::prefix('locations')->group(function () {
     Route::get('/full-address', [ApiLocationController::class, 'getFullAddress']);
 });
 
-// Protected routes (authentication required)
-Route::middleware(['auth:sanctum'])->group(function () {
+
     
 
     // Users API (admin only)
@@ -79,5 +78,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('{id}', [ApiVoucherController::class, 'update'])->where('id', '[0-9]+');
         Route::delete('{id}', [ApiVoucherController::class, 'destroy'])->where('id', '[0-9]+');
     });
-});
+
 

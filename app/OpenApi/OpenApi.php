@@ -6,7 +6,9 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Info(title="DuAnTotNghiep API", version="1.0.0", description="REST API documentation for Users and other resources")
- * @OA\Server(url="/duan/duan/duantotnghiep/public", description="Localhost base path")
+ * @OA\Server(url="http://127.0.0.1:8000", description="Laravel dev server")
+ * @OA\Server(url="/duan/duan/duantotnghiep/public", description="XAMPP localhost")
+ * @OA\Server(url="https://api.duantotnghiep.com", description="Production")
  * @OA\Tag(name="1. Location", description="Location management endpoints")
  * @OA\Tag(name="2. Users", description="User management endpoints") 
  * @OA\Tag(name="3. Categories", description="Category management endpoints")

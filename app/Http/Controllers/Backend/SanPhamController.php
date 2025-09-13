@@ -112,7 +112,7 @@ class SanPhamController extends Controller
     public function store(StoreSanPhamRequest $request)
     {
         try {
-            $validated = $request->validated();
+        $validated = $request->validated();
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Khi validation lỗi, upload file tạm thời và giữ lại
             $oldInput = $request->except(['_token']);
@@ -293,7 +293,7 @@ class SanPhamController extends Controller
     public function update(UpdateSanPhamRequest $request, $id)
     {
         try {
-            $validated = $request->validated();
+        $validated = $request->validated();
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Khi validation lỗi, upload file tạm thời và giữ lại
             $oldInput = $request->except(['_token', '_method']);
@@ -395,13 +395,13 @@ class SanPhamController extends Controller
             $payload['image_extra_paths'] = $extraPaths;
             $payload['variants'] = $request->input('variants', []);
             $payload['deleted_images'] = $request->input('deleted_images', []);
-            
+
             // Debug logging
             Log::info('SanPhamController update: deleted_images = ' . json_encode($payload['deleted_images']));
             Log::info('SanPhamController update: full payload = ' . json_encode($payload));
 
             try {
-                $service->update((int)$id, $payload);
+            $service->update((int)$id, $payload);
                 Log::info('SanPhamController update: Service update completed successfully');
             } catch (\Exception $e) {
                 Log::error('SanPhamController update: Service update failed: ' . $e->getMessage());
