@@ -12,9 +12,11 @@ interface UserRepositoryInterface
     public function create($payload);
     public function findById($id);
     public function find($id);
+    public function update($id, $data);
     public function delete($id);
     public function search(array $filters);
     public function deleteMany(array $ids);
     public function updateStatusMany(array $ids, $status);
     public function updateRoleMany(array $ids, $role);
+    public function findByEmail(string $email);
 }

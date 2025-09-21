@@ -22,35 +22,40 @@ use App\Http\Controllers\Ajax\SanPhamAjaxController;
 use App\Http\Controllers\Ajax\DonHangAjaxController;
 
 // ========================================
-// DASHBOARD ROUTES
+// DASHBOARD ROUTES (Protected - Chỉ admin)
 // ========================================
-Route::get('/dashboard/index', [DashboardController::class, 'index'])->name('dashboard.index');
+Route::middleware(['auth', 'role:admin', 'adminlock'])->group(function () {
+    Route::get('/dashboard/index', [DashboardController::class, 'index'])->name('dashboard.index');
+});
 
 // ========================================
-// STATISTICS ROUTES
+// STATISTICS ROUTES (Protected - Chỉ admin)
 // ========================================
-Route::get('/admin/statistics', [StatisticsController::class, 'index'])->name('admin.statistics');
-Route::get('/admin/dashboard', [StatisticsController::class, 'index'])->name('admin.dashboard');
-Route::get('/admin/statistics/chart-data', [StatisticsController::class, 'getChartData'])->name('admin.statistics.chart');
-Route::get('/admin/statistics/filtered-stats', [StatisticsController::class, 'getFilteredStats'])->name('admin.statistics.filtered');
-Route::get('/admin/statistics/top-products', [StatisticsController::class, 'getTopProducts'])->name('admin.statistics.products');
-Route::get('/admin/statistics/top-customers', [StatisticsController::class, 'getTopCustomers'])->name('admin.statistics.customers');
+Route::middleware(['auth', 'role:admin', 'adminlock'])->group(function () {
+    Route::get('/admin/', [StatisticsController::class, 'index'])->name('admin.statistics');
+    Route::get('/admin/statistics', [StatisticsController::class, 'index'])->name('admin.statistics');
+    Route::get('/admin/dashboard', [StatisticsController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/statistics/chart-data', [StatisticsController::class, 'getChartData'])->name('admin.statistics.chart');
+    Route::get('/admin/statistics/filtered-stats', [StatisticsController::class, 'getFilteredStats'])->name('admin.statistics.filtered');
+    Route::get('/admin/statistics/top-products', [StatisticsController::class, 'getTopProducts'])->name('admin.statistics.products');
+    Route::get('/admin/statistics/top-customers', [StatisticsController::class, 'getTopCustomers'])->name('admin.statistics.customers');
+});
 
 // ========================================
-// STORE SETTINGS ROUTES
+// STORE SETTINGS ROUTES (Protected - Chỉ admin)
 // ========================================
-Route::prefix('admin/store')->name('admin.store.')->group(function () {
+Route::middleware(['auth', 'role:admin', 'adminlock'])->prefix('admin/store')->name('admin.store.')->group(function () {
     Route::get('/settings', [StoreSettingsController::class, 'get'])->name('get');
     Route::post('/settings', [StoreSettingsController::class, 'update'])->name('update');
 });
 
 // ========================================
-// AJAX ROUTES
+// AJAX ROUTES (Protected - Chỉ admin)
 // ========================================
-
-// Location
-Route::get('ajax/location/getLocation', [LocationController::class, 'getLocation'])
-    ->name('ajax.location.getLocation');
+Route::middleware(['auth', 'role:admin', 'adminlock'])->group(function () {
+    // Location
+    Route::get('ajax/location/getLocation', [LocationController::class, 'getLocation'])
+        ->name('ajax.location.getLocation');
 
 // User Ajax
 Route::post('ajax/user/toggle-status', [UserAjaxController::class, 'toggleStatus'])
@@ -110,14 +115,23 @@ Route::prefix('ajax/donhang')->name('ajax.donhang.')->group(function () {
     
     Route::get('/get-top-products', [DonHangAjaxController::class, 'getTopProducts'])
         ->name('get.top.products');
+    
+    // Route kiểm tra session cho admin
+    Route::get('/admin/check-session', function() {
+        if (auth()->check() && auth()->user()->user_catalogue_id == 1) {
+            return response()->json(['status' => 'ok']);
+        }
+        return response()->json(['status' => 'unauthorized'], 401);
+    })->name('admin.check.session');
 });
+}); // Đóng group middleware cho AJAX routes
 
 // ========================================
-// ADMIN ROUTES
+// ADMIN ROUTES (Protected - Chỉ admin)
 // ========================================
-
-// User Management
-Route::group(['prefix' => 'admin/user'], function () {
+Route::middleware(['auth', 'role:admin', 'adminlock'])->group(function () {
+    // User Management
+    Route::group(['prefix' => 'admin/user'], function () {
     Route::get('index', [UserController::class, 'index'])
         ->name('user.index');
     Route::get('statistics', [UserController::class, 'statistics'])
@@ -371,17 +385,64 @@ Route::group(['prefix' => 'admin/vouchers'], function () {
 // FRONTEND ROUTES
 // ========================================
 
+}); // Đóng group middleware cho ADMIN ROUTES
+
+// ========================================
+// PUBLIC ROUTES
+// ========================================
+
 // Home
-Route::view('/', 'fontend.home.trangchu')->name('home');
-Route::view('/trangchu', 'fontend.home.trangchu');
+Route::get('/', [\App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
+Route::get('/trangchu', [\App\Http\Controllers\Frontend\HomeController::class, 'index']);
+
+// Products
+Route::get('/sanpham', [\App\Http\Controllers\Frontend\ProductController::class, 'index'])->name('products');
+Route::get('/sanpham/{id}', [\App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('product.detail');
+
+// Categories
+Route::get('/danh-muc/{slug}', [\App\Http\Controllers\Frontend\CategoryController::class, 'show'])->name('category.show');
+
+// Cart routes
+Route::get('/giohang', [\App\Http\Controllers\Frontend\CartController::class, 'index'])->name('cart');
+Route::post('/cart/add', [\App\Http\Controllers\Frontend\CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [\App\Http\Controllers\Frontend\CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove', [\App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear', [\App\Http\Controllers\Frontend\CartController::class, 'clear'])->name('cart.clear');
+Route::get('/cart/info', [\App\Http\Controllers\Frontend\CartController::class, 'getCartInfo'])->name('cart.info');
+Route::get('/api/cart/display-stock/{productId}', [\App\Http\Controllers\Frontend\CartController::class, 'getDisplayStock'])->name('cart.display.stock');
+
+// Checkout routes - yêu cầu đăng nhập
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout', [\App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout/process', [\App\Http\Controllers\Frontend\CheckoutController::class, 'processOrder'])->name('checkout.process');
+    Route::get('/checkout/success/{orderId}', [\App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/checkout/failure/{orderId}', [\App\Http\Controllers\Frontend\CheckoutController::class, 'failure'])->name('checkout.failure');
+    Route::post('/checkout/check-voucher', [\App\Http\Controllers\Frontend\CheckoutController::class, 'checkVoucher'])->name('checkout.check.voucher');
+});
 
 // Static pages
 Route::view('/gioithieu', 'fontend.about.gioithieu')->name('about');
-Route::view('/sanpham', 'fontend.products.sanpham')->name('products');
-Route::view('/trangchitiet', 'fontend.product.trangchitiet')->name('product.detail');
-Route::view('/giohang', 'fontend.cart.giohang')->name('cart');
 Route::view('/contact', 'fontend.contact.contact')->name('contact');
 
 // Authentication
 Route::view('/dangnhap', 'fontend.auth.dangnhap')->name('login');
 Route::view('/dangki', 'fontend.auth.dangki')->name('register');
+Route::post('/dangki', [\App\Http\Controllers\Auth\AuthController::class, 'register'])->name('register.post');
+Route::post('/dangnhap', [\App\Http\Controllers\Auth\AuthController::class, 'login'])->name('login.post');
+Route::post('/logout', [\App\Http\Controllers\Auth\AuthController::class, 'logout'])->name('logout');
+
+// Google Login
+Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback']);
+Route::get('/auth/google/logout', [\App\Http\Controllers\Auth\GoogleController::class, 'logoutGoogle'])->name('google.logout');
+
+// Password Reset Routes
+Route::get('/quen-mat-khau', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/quen-mat-khau', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/dat-lai-mat-khau/{token}', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/dat-lai-mat-khau', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
+
+// Product listing pages
+Route::get('/sanpham-noi-bat', [\App\Http\Controllers\Frontend\ProductController::class, 'featured'])->name('products.featured');
+Route::get('/sanpham-khuyen-mai', [\App\Http\Controllers\Frontend\ProductController::class, 'sale'])->name('products.sale');
+Route::get('/sanpham-ban-chay', [\App\Http\Controllers\Frontend\ProductController::class, 'bestselling'])->name('products.bestselling');

@@ -12,22 +12,38 @@
     <div class="logo">ThriftZone</div>
   </div>
   <h2>Đăng ký</h2>
-  <form id="formDangKy" novalidate>
+
+  @if (session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+  @endif
+  @if (session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+  @endif
+  @if ($errors->any())
+    <div class="alert alert-danger">
+      @foreach ($errors->all() as $error)
+        <div>{{ $error }}</div>
+      @endforeach
+    </div>
+  @endif
+
+  <form id="formDangKy" method="POST" action="{{ url('/dangki') }}" novalidate>
+    @csrf
     <div class="mb-3">
-      <label for="ten" class="form-label">Tên người dùng</label>
-      <input type="text" class="form-control" id="ten" name="ten" required>
+      <label for="name" class="form-label">Tên người dùng</label>
+      <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
     </div>
     <div class="mb-3">
       <label for="email" class="form-label">Email</label>
-      <input type="email" class="form-control" id="email" name="email" required>
+      <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required>
     </div>
     <div class="mb-3">
-      <label for="matkhau" class="form-label">Mật khẩu</label>
-      <input type="password" class="form-control" id="matkhau" name="matkhau" required>
+      <label for="password" class="form-label">Mật khẩu</label>
+      <input type="password" class="form-control" id="password" name="password" required>
     </div>
     <div class="mb-3">
-      <label for="nhaplaimatkhau" class="form-label">Nhập lại mật khẩu</label>
-      <input type="password" class="form-control" id="nhaplaimatkhau" name="nhaplaimatkhau" required>
+      <label for="password_confirmation" class="form-label">Nhập lại mật khẩu</label>
+      <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
     </div>
     <div class="form-check mb-3">
       <input class="form-check-input" type="checkbox" id="nhoMatKhau">

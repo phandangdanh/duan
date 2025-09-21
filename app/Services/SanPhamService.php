@@ -30,6 +30,7 @@ class SanPhamService implements SanPhamServiceInterface
                 'trangthai'  => $payload['status'] ?? 1,
                 'base_price' => $normalizedBasePrice,
                 'base_sale_price' => $normalizedBaseSale,
+                'soLuong'    => $payload['soLuong'] ?? 1,
             ]);
 
             if (!empty($payload['variants'])) {
@@ -65,6 +66,7 @@ class SanPhamService implements SanPhamServiceInterface
                 'trangthai'  => $payload['status'] ?? DB::raw('trangthai'),
                 'base_price' => array_key_exists('base_price', $payload) ? $normalizedBasePrice : DB::raw('base_price'),
                 'base_sale_price' => array_key_exists('base_sale_price', $payload) ? $normalizedBaseSale : DB::raw('base_sale_price'),
+                'soLuong'    => array_key_exists('soLuong', $payload) ? ($payload['soLuong'] ?? 1) : DB::raw('soLuong'),
             ]);
 
             if (!empty($payload['variants'])) {
@@ -105,19 +107,19 @@ class SanPhamService implements SanPhamServiceInterface
     public function list(array $filters): array
     {
         try {
-            $validPerPages = [5, 10, 25, 50, 100, 'all'];
-            $perPage = $filters['perpage'] ?? 10;
+            $validPerPages = [12, 24, 48, 'all'];
+            $perPage = $filters['perpage'] ?? 12;
             
             // Xử lý perpage đúng cách
             if (is_string($perPage) && $perPage === 'all') {
                 // Giữ nguyên 'all'
             } elseif (is_numeric($perPage) || is_string($perPage) && is_numeric($perPage)) {
                 $perPage = (int) $perPage;
-                if (!in_array($perPage, [5, 10, 25, 50, 100], true)) {
-                    $perPage = 10;
+                if (!in_array($perPage, [12, 24, 48], true)) {
+                    $perPage = 12;
                 }
             } else {
-                $perPage = 10;
+                $perPage = 12;
             }
             
 

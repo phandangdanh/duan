@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
 
                     <!-- Giá sản phẩm (giá chính ở sản phẩm) -->
-                    <div class="card margin-bottom-4">
+                    {{-- <div class="card margin-bottom-4">
                         <div class="card-header" style="margin: 20px 0px;">
                             <h1 class="ctsph1">Giá sản phẩm</h1>
                         </div>
@@ -398,7 +398,64 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                             </div>
                         </div>
+                    </div> --}}
+
+                    <!-- Giá sản phẩm chính -->
+                    <div class="card margin-bottom-4">
+                        <div class="card-header" style="margin: 20px 0px;">
+                            <h1 class="ctsph1">Giá sản phẩm</h1>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 margin-bottom-4" style="margin: 20px 0px;">
+                                    <label for="soLuong" class="form-label">
+                                        <span style="font-weight: bold;">Số lượng sản phẩm chính</span>
+                                    </label>
+                                    <input type="number" name="soLuong" id="soLuong" 
+                                        class="form-control @error('soLuong') is-invalid @enderror" 
+                                        placeholder="1" value="{{ old('soLuong', $sanpham->soLuong ?? 1) }}" min="0">
+                                    <small class="form-text text-muted">Số lượng tồn kho chính (không tính variant)</small>
+                                    @error('soLuong')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="col-md-4 margin-bottom-4" style="margin: 20px 0px;">
+                                    <label for="base_price" class="form-label">
+                                        <span style="font-weight: bold;">Giá gốc (sản phẩm chính)</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" name="base_price" id="base_price" 
+                                            class="form-control @error('base_price') is-invalid @enderror" 
+                                            placeholder="0" value="{{ old('base_price', $sanpham->base_price) }}">
+                                        <span class="input-group-text">VND</span>
+                                    </div>
+                                    <small class="form-text text-muted">Biến thể không lập giá sẽ dùng giá này</small>
+                                    @error('base_price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="col-md-4 margin-bottom-4" style="margin: 20px 0px;">
+                                    <label for="base_sale_price" class="form-label">
+                                        <span style="font-weight: bold;">Giá khuyến mãi (sản phẩm chính)</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" name="base_sale_price" id="base_sale_price" 
+                                            class="form-control @error('base_sale_price') is-invalid @enderror" 
+                                            placeholder="0" value="{{ old('base_sale_price', $sanpham->base_sale_price) }}">
+                                        <span class="input-group-text">VND</span>
+                                    </div>
+                                    <small class="form-text text-muted">Để trống nếu không có khuyến mãi</small>
+                                    @error('base_sale_price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+
 
                     <!-- Hình ảnh sản phẩm -->
                     <div class="card margin-bottom-4">
@@ -745,6 +802,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+                    
                     <!-- Trạng thái -->
                     <div class="card margin-bottom-4">
                         <div class="card-header" style="margin: 20px 0px;">

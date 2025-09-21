@@ -74,7 +74,7 @@
                 </div>
 
                 <!-- Giá chung (áp dụng mặc định cho biến thể nếu không nhập) -->
-                <div class="card margin-bottom-4">
+                {{-- <div class="card margin-bottom-4">
                     <div class="card-header" style="margin: 20px 0px;">
                         <h1 class="ctsph1">Giá sản phẩm</h1>
                     </div>
@@ -99,7 +99,63 @@
                             
                         </div>
                     </div>
+                </div> --}}
+
+                <!-- Giá sản phẩm chính -->
+                <div class="card margin-bottom-4">
+                    <div class="card-header" style="margin: 20px 0px;">
+                        <h1 class="ctsph1">Giá sản phẩm</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 margin-bottom-4" style="margin: 20px 0px;">
+                                <label for="soLuong" class="form-label">
+                                    <span style="font-weight: bold;">Số lượng sản phẩm chính</span>
+                                </label>
+                                <input type="number" name="soLuong" id="soLuong" 
+                                    class="form-control @error('soLuong') is-invalid @enderror" 
+                                    placeholder="1" value="{{ old('soLuong', 1) }}" min="0">
+                                <small class="form-text text-muted">Số lượng tồn kho chính (không tính variant)</small>
+                                @error('soLuong')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            <div class="col-md-4 margin-bottom-4" style="margin: 20px 0px;">
+                                <label for="base_price" class="form-label">
+                                    <span style="font-weight: bold;">Giá gốc (sản phẩm chính)</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" name="base_price" id="base_price" 
+                                        class="form-control @error('base_price') is-invalid @enderror" 
+                                        placeholder="0" value="{{ old('base_price') }}">
+                                    <span class="input-group-text">VND</span>
+                                </div>
+                                <small class="form-text text-muted">Biến thể không lập giá sẽ dùng giá này</small>
+                                @error('base_price')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            <div class="col-md-4 margin-bottom-4" style="margin: 20px 0px;">
+                                <label for="base_sale_price" class="form-label">
+                                    <span style="font-weight: bold;">Giá khuyến mãi (sản phẩm chính)</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" name="base_sale_price" id="base_sale_price" 
+                                        class="form-control @error('base_sale_price') is-invalid @enderror" 
+                                        placeholder="0" value="{{ old('base_sale_price') }}">
+                                    <span class="input-group-text">VND</span>
+                                </div>
+                                <small class="form-text text-muted">Để trống nếu không có khuyến mãi</small>
+                                @error('base_sale_price')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
 
                 <!-- Hình ảnh sản phẩm -->
                 <div class="card margin-bottom-4">
@@ -138,7 +194,6 @@
                                    class="form-control @error('image_extra') is-invalid @enderror" 
                                    accept="image/*" multiple>
                             <input type="hidden" name="image_extra_uploaded" value="0">
-                            <input type="hidden" name="temp_extra_keys[]" id="temp_extra_keys_holder" value="">
                             @php $oldTempKeys = old('temp_extra_keys'); @endphp
                             @if(is_array($oldTempKeys) && count($oldTempKeys))
                                 @foreach($oldTempKeys as $k)
@@ -160,7 +215,7 @@
                         <h1 class="ctsph1">Chi tiết sản phẩm</h1>
                         <div class="alert alert-info mb-0">
                             <i class="fa fa-info-circle me-2"></i>
-                            <strong>Hướng dẫn:</strong> Tạo các biến thể sản phẩm với màu sắc khác nhau, mỗi màu có thể có nhiều size với thông tin riêng biệt.
+                            <strong>Hướng dẫn:</strong> Biến thể là tùy chọn. Bạn có thể tạo sản phẩm chỉ với giá chính, hoặc thêm biến thể với màu sắc và size khác nhau.
                         </div>
                     </div>
                     <div class="card-body">
@@ -238,7 +293,7 @@
                                                     <tr class="size-variant-row">
                                 <td>
                                     <div class="size-select-container">
-                                                                <select style="height: 40px;" name="variants[0][sizes][0][size]" class="form-select size-select" required>
+                                                                <select style="height: 40px;" name="variants[0][sizes][0][size]" class="form-select size-select">
                                             <option value="">-- Chọn size --</option>
                                             @foreach($sizes as $size)
                                                 <option value="{{ $size->id }}" data-size-name="{{ $size->name }}" {{ old('variants.0.sizes.0.size') == $size->id ? 'selected' : '' }}>{{ $size->name }}</option>
@@ -249,7 +304,7 @@
                                 </td>
                                                         <td>
                                                             <input type="number" name="variants[0][sizes][0][so_luong]" 
-                                                                   class="form-control" value="{{ old('variants.0.sizes.0.so_luong', 1) }}" min="0" required>
+                                                                   class="form-control" value="{{ old('variants.0.sizes.0.so_luong', 1) }}" min="0">
                                                             <small class="form-text text-muted">Số lượng tồn kho</small>
                                                         </td>
                                                         <td>
@@ -284,7 +339,7 @@
                                                 <i class="fa fa-plus me-1"></i>Thêm size mới
                                             </button>
                                             <small class="form-text text-muted ms-2">
-                                                Mỗi biến thể phải có ít nhất 1 size
+                                                Biến thể có thể không có size (tùy chọn)
                                             </small>
                                         </div>
                                     </div>
@@ -306,14 +361,14 @@
 
 
 
-                <!-- Giá tổng quan và trạng thái -->
+               
+                <!-- Trạng thái sản phẩm -->
                 <div class="card margin-bottom-4">
                     <div class="card-header" style="margin: 20px 0px;">
                         <h1 class="ctsph1">Thông tin hiển thị</h1>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <!-- Bỏ trường giá tổng quan nếu bảng không có cột price -->
                             <div class="col-md-6 margin-bottom-4" style="margin: 26px 0px;">
                                 <label for="status" class="form-label">Trạng thái</label>
                                 <select style="height: 40px;" name="status" id="status" class="form-select">
@@ -623,12 +678,13 @@ $(document).ready(function() {
 
     // Upload tạm + Preview hình ảnh phụ
     $('#image_extra, #image_extra_fake').on('change', function(e) {
-        $('input[name="image_extra_uploaded"]').val('1');
         const files = e.target.files;
         const previewContainer = $('#image_extra_preview');
         previewContainer.empty();
 
         if (files.length > 0) {
+            // Chỉ set uploaded = 1 khi thực sự có file
+            $('input[name="image_extra_uploaded"]').val('1');
             // Xóa placeholder cũ nếu có
             $('.alert-warning').remove();
             
@@ -649,22 +705,27 @@ $(document).ready(function() {
             const fileNames = [];
             const tempKeys = [];
             Array.from(files).forEach((file, index) => {
-                fileNames.push(file.name);
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('type', 'extra');
-                $.ajax({
-                    url: '{{ route('ajax.sanpham.uploadTemp') }}',
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                    data: formData,
-                    async: false,
-                    contentType: false,
-                    processData: false,
-                    success: function(resp){
-                        if(resp.success){ tempKeys.push(resp.temp_key); }
-                    }
-                });
+                // Chỉ xử lý file hợp lệ
+                if (file && file.size > 0) {
+                    fileNames.push(file.name);
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('type', 'extra');
+                    $.ajax({
+                        url: '{{ route('ajax.sanpham.uploadTemp') }}',
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        data: formData,
+                        async: false,
+                        contentType: false,
+                        processData: false,
+                        success: function(resp){
+                            if(resp.success && resp.temp_key){ 
+                                tempKeys.push(resp.temp_key); 
+                            }
+                        }
+                    });
+                }
                 
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -698,12 +759,21 @@ $(document).ready(function() {
                 }).appendTo('#create-product-form');
             });
 
-            // Lưu các temp key
+            // Lưu các temp key - chỉ khi có keys thực sự
             // Clear cũ
             $('input[name="temp_extra_keys[]"]').remove();
-            tempKeys.forEach(function(key){
-                $('<input>').attr({ type: 'hidden', name: 'temp_extra_keys[]', value: key }).appendTo('#create-product-form');
-            });
+            if (tempKeys.length > 0) {
+                tempKeys.forEach(function(key){
+                    if (key && key.trim() !== '') {
+                        $('<input>').attr({ type: 'hidden', name: 'temp_extra_keys[]', value: key }).appendTo('#create-product-form');
+                    }
+                });
+            }
+        } else {
+            // Khi không có file, xóa tất cả temp keys và set uploaded = 0
+            $('input[name="temp_extra_keys[]"]').remove();
+            $('input[name="image_extra_uploaded"]').val('0');
+            $('input[name="image_extra_names[]"]').remove();
         }
     });
 
@@ -760,6 +830,9 @@ $(document).ready(function() {
         }
     });
 
+    // Tắt validation HTML5 cho tất cả input
+    $('input, select, textarea').removeAttr('required');
+    
     // Validation form trước khi submit
     $('#create-product-form').on('submit', function(e) {
         let isValid = true;
@@ -796,18 +869,18 @@ $(document).ready(function() {
             $('#image_main').removeClass('is-invalid');
         }
 
-        // Kiểm tra ít nhất một biến thể
+        // Kiểm tra biến thể - không bắt buộc, nhưng nếu có thì phải hợp lệ
         // Cho phép tạo sản phẩm chỉ với giá sản phẩm chính (không bắt buộc biến thể)
 
-        // Kiểm tra mỗi biến thể có ít nhất một size và validation giá
+        // Kiểm tra mỗi biến thể có ít nhất một size và validation giá (chỉ khi có biến thể)
         $('.variant-item').each(function(index) {
             const sizes = $(this).find('.size-variant-row').length;
             if (sizes === 0) {
-                errorMessages.push(`Biến thể #${index + 1} cần có ít nhất một size`);
-                isValid = false;
+                // Không bắt buộc size, chỉ cảnh báo
+                console.log(`Biến thể #${index + 1} không có size - sẽ bỏ qua biến thể này`);
             }
             
-            // Kiểm tra giá trong mỗi size
+            // Kiểm tra giá trong mỗi size (chỉ khi có size)
             $(this).find('.price-input').each(function() {
                 const priceValue = $(this).val().trim();
                 if (priceValue && (isNaN(priceValue) || parseFloat(priceValue) < 0)) {
@@ -819,10 +892,20 @@ $(document).ready(function() {
                 }
             });
 
-            // Mặc định số lượng = 1 nếu bỏ trống
+            // Mặc định số lượng = 1 nếu bỏ trống và validation (chỉ khi có size)
             $(this).find('input[name*="[so_luong]"]').each(function(){
                 if($(this).val() === '' || $(this).val() === null){
                     $(this).val(1);
+                }
+                
+                // Validation số lượng
+                const quantity = parseInt($(this).val());
+                if (isNaN(quantity) || quantity < 0) {
+                    errorMessages.push(`Số lượng phải là số và lớn hơn hoặc bằng 0`);
+                    $(this).addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    $(this).removeClass('is-invalid');
                 }
             });
         });
@@ -867,7 +950,7 @@ $(document).ready(function() {
         const btn = this;
         const variantItem = $(btn).closest('.variant-item');
         const sizeRows = variantItem.find('.size-variant-row');
-        if (sizeRows.length <= 1) { showToast('Mỗi biến thể phải có ít nhất 1 size'); return; }
+        // Cho phép xóa tất cả size - không bắt buộc phải có ít nhất 1 size
         showConfirm('Bạn có chắc chắn muốn xóa size này?').then(function(agree){
             if (agree) {
                 $(btn).closest('.size-variant-row').fadeOut(300, function(){ $(this).remove(); });
@@ -886,7 +969,7 @@ $(document).ready(function() {
             <tr class="size-variant-row">
                 <td>
                     <div class="size-select-container">
-                        <select style="height: 40px;" name="variants[${variantIndex}][sizes][${newIndex}][size]" class="form-select size-select" required>
+                        <select style="height: 40px;" name="variants[${variantIndex}][sizes][${newIndex}][size]" class="form-select size-select">
                             <option value="">-- Chọn size --</option>
                             @foreach($sizes as $size)
                                 <option value="{{ $size->id }}" data-size-name="{{ $size->name }}">{{ $size->name }}</option>
@@ -922,6 +1005,9 @@ $(document).ready(function() {
         `;
         
         tbody.append(newRow);
+        
+        // Tắt validation HTML5 cho element mới
+        tbody.find('input, select, textarea').removeAttr('required');
     });
 
     // Xử lý thêm biến thể mới
@@ -1002,7 +1088,7 @@ $(document).ready(function() {
                                     <tr class="size-variant-row">
                                         <td>
                                             <div class="size-select-container">
-                                                <select style="height: 40px;" name="variants[${variantIndex}][sizes][0][size]" class="form-select size-select" required>
+                                                <select style="height: 40px;" name="variants[${variantIndex}][sizes][0][size]" class="form-select size-select">
                                                     <option value="">-- Chọn size --</option>
                                                     @foreach($sizes as $size)
                                                         <option value="{{ $size->id }}" data-size-name="{{ $size->name }}">{{ $size->name }}</option>
@@ -1013,7 +1099,7 @@ $(document).ready(function() {
                                         </td>
                                         <td>
                                             <input type="number" name="variants[${variantIndex}][sizes][0][so_luong]" 
-                                                   class="form-control" value="1" min="0" required>
+                                                   class="form-control" value="1" min="0">
                                             <small class="form-text text-muted">Số lượng tồn kho</small>
                                         </td>
                                         <td>
@@ -1048,7 +1134,7 @@ $(document).ready(function() {
                                 <i class="fa fa-plus me-1"></i>Thêm size mới
                             </button>
                             <small class="form-text text-muted ms-2">
-                                Mỗi biến thể phải có ít nhất 1 size
+                                Biến thể có thể không có size (tùy chọn)
                             </small>
                         </div>
                     </div>
@@ -1057,6 +1143,9 @@ $(document).ready(function() {
         `;
         
         $('#variants-container').append(newVariant);
+        
+        // Tắt validation HTML5 cho biến thể mới
+        $('#variants-container').find('input, select, textarea').removeAttr('required');
     });
 });
 </script>

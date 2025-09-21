@@ -316,6 +316,107 @@ class ApiVoucherController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *   path="/api/vouchers/check",
+     *   summary="Kiểm tra voucher theo mã",
+     *   tags={"6. Vouchers"},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       example={"ma_voucher":"GIAM10","total_amount":"100000"}
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Voucher hợp lệ",
+     *     @OA\JsonContent(example={"status_code":200,"data":{"id":1,"ma_voucher":"GIAM10","ten_voucher":"Giảm 10%","loai_giam_gia":"phan_tram","gia_tri":"10.00","discount_amount":"10000","final_amount":"90000"},"message":"Voucher hợp lệ"})
+     *   ),
+     *   @OA\Response(response="default", description="Lỗi")
+     * )
+     */
+    public function checkVoucher(Request $request)
+    {
+        try {
+            $maVoucher = $request->input('ma_voucher');
+            $totalAmount = $request->input('total_amount', 0);
+            
+            if (empty($maVoucher)) {
+                return response()->json([
+                    'status_code' => 400,
+                    'message' => 'Mã voucher là bắt buộc',
+                    'errors' => ['ma_voucher' => ['Mã voucher không được để trống']]
+                ], 400);
+            }
+            
+            $voucher = Voucher::where('ma_voucher', $maVoucher)
+                ->where('trang_thai', 1)
+                ->where('ngay_bat_dau', '<=', now())
+                ->where('ngay_ket_thuc', '>=', now())
+                ->first();
+                
+            if (!$voucher) {
+                return response()->json([
+                    'status_code' => 404,
+                    'message' => 'Mã voucher không hợp lệ hoặc đã hết hạn',
+                    'errors' => ['ma_voucher' => ['Mã voucher không tồn tại hoặc đã hết hạn']]
+                ], 404);
+            }
+            
+            // Kiểm tra số lượng còn lại
+            if ($voucher->so_luong <= 0) {
+                return response()->json([
+                    'status_code' => 400,
+                    'message' => 'Voucher đã hết lượt sử dụng',
+                    'errors' => ['ma_voucher' => ['Voucher đã hết lượt sử dụng']]
+                ], 400);
+            }
+            
+            // Kiểm tra giá trị tối thiểu
+            if ($voucher->gia_tri_toi_thieu && $totalAmount < $voucher->gia_tri_toi_thieu) {
+                return response()->json([
+                    'status_code' => 400,
+                    'message' => 'Đơn hàng chưa đạt giá trị tối thiểu',
+                    'errors' => ['total_amount' => ['Đơn hàng phải có giá trị tối thiểu ' . number_format($voucher->gia_tri_toi_thieu, 0, ',', '.') . '₫']]
+                ], 400);
+            }
+            
+            // Tính toán giảm giá
+            $discountAmount = 0;
+            if ($voucher->loai_giam_gia === 'phan_tram') {
+                $discountAmount = ($totalAmount * $voucher->gia_tri) / 100;
+                if ($voucher->gia_tri_toi_da && $discountAmount > $voucher->gia_tri_toi_da) {
+                    $discountAmount = $voucher->gia_tri_toi_da;
+                }
+            } else {
+                $discountAmount = $voucher->gia_tri;
+            }
+            
+            $finalAmount = max(0, $totalAmount - $discountAmount);
+            
+            return response()->json([
+                'status_code' => 200,
+                'data' => [
+                    'id' => $voucher->id,
+                    'ma_voucher' => $voucher->ma_voucher,
+                    'ten_voucher' => $voucher->ten_voucher,
+                    'loai_giam_gia' => $voucher->loai_giam_gia,
+                    'gia_tri' => $voucher->gia_tri,
+                    'discount_amount' => $discountAmount,
+                    'final_amount' => $finalAmount
+                ],
+                'message' => 'Voucher hợp lệ'
+            ], 200);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Lỗi hệ thống',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * @OA\Delete(
      *   path="/api/vouchers/{id}",
      *   summary="Xóa voucher",

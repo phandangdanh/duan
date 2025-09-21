@@ -1,3 +1,29 @@
+  /* Hide large chevron/arrow icons globally */
+  .chevron-left,
+  .chevron-right,
+  .arrow-left,
+  .arrow-right,
+  [class*="chevron"],
+  [class*="arrow"] {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Hide any large icons */
+  *[style*="width: 100px"],
+  *[style*="height: 100px"],
+  *[style*="font-size: 50px"] {
+    display: none !important;
+  }
+
+  /* Force normal size for all elements */
+  * {
+    max-width: 100% !important;
+  }
+
   nav.navbar {
       position: sticky;
       top: 0;

@@ -10,7 +10,7 @@ class MauSac extends Model
     use HasFactory;
 
     protected $table = 'mausac';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'ten',

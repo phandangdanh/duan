@@ -1,0 +1,155 @@
+/* CSS riêng cho trang sản phẩm nổi bật */
+
+.sanphamnoibat {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+.sanphamnoibat .card {
+  background: white;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border-radius: 15px !important;
+}
+
+.sanphamnoibat .card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+.sanphamnoibat .badge {
+  background: linear-gradient(45deg, #dc3545, #c82333) !important;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px !important;
+}
+
+.sanphamnoibat .btn-outline-primary {
+  border-color: #0d6efd;
+  color: #0d6efd;
+  font-weight: 500;
+  border-radius: 25px !important;
+}
+
+.sanphamnoibat .btn-outline-primary:hover {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.sanphamnoibat .btn-danger {
+  background: linear-gradient(45deg, #dc3545, #c82333);
+  border: none;
+  font-weight: 500;
+  border-radius: 25px !important;
+}
+
+.sanphamnoibat .btn-danger:hover {
+  background: linear-gradient(45deg, #c82333, #a71e2a);
+  transform: translateY(-1px);
+}
+
+/* Header styling */
+.sanphamnoibat h1 {
+  background: linear-gradient(45deg, #0d6efd, #6610f2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* Product grid spacing */
+.sanphamnoibat .row {
+  margin: 0 -10px;
+}
+
+.sanphamnoibat .col-12,
+.sanphamnoibat .col-sm-6,
+.sanphamnoibat .col-md-4,
+.sanphamnoibat .col-lg-3 {
+  padding: 0 10px;
+  margin-bottom: 20px;
+}
+
+/* Price styling */
+.sanphamnoibat .text-danger {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+
+.sanphamnoibat .text-success {
+  color: #198754 !important;
+  font-weight: 600;
+}
+
+/* Pagination styling for sanphamnoibat */
+.sanphamnoibat .pagination {
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+.sanphamnoibat .pagination .page-link {
+  border-radius: 8px;
+  margin: 0 2px;
+  border: 1px solid #dee2e6;
+  color: #0d6efd;
+  font-weight: 500;
+}
+
+.sanphamnoibat .pagination .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+}
+
+.sanphamnoibat .pagination .page-link:hover {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #0d6efd;
+}
+
+/* Breadcrumb styling */
+.sanphamnoibat .breadcrumb {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 10px 20px;
+  backdrop-filter: blur(10px);
+}
+
+.sanphamnoibat .breadcrumb-item a {
+  color: #0d6efd;
+  text-decoration: none;
+}
+
+.sanphamnoibat .breadcrumb-item a:hover {
+  color: #6610f2;
+  text-decoration: underline;
+}
+
+/* Empty state styling */
+.sanphamnoibat .text-center {
+  padding: 4rem 0;
+}
+
+.sanphamnoibat .text-center i {
+  color: #6c757d;
+  opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sanphamnoibat .card {
+    margin-bottom: 1rem;
+  }
+  
+  .sanphamnoibat h1 {
+    font-size: 1.8rem;
+  }
+  
+  .sanphamnoibat .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+}

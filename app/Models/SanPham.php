@@ -21,6 +21,7 @@ class SanPham extends Model
         'trangthai',
         'base_price',
         'base_sale_price',
+        'soLuong',
     ];
 
     protected $casts = [
@@ -28,6 +29,7 @@ class SanPham extends Model
         'trangthai' => 'boolean',
         'base_price' => 'decimal:2',
         'base_sale_price' => 'decimal:2',
+        'soLuong' => 'integer',
     ];
 
     // Accessor để chuyển đổi trangthai từ 0/1 sang boolean
@@ -89,6 +91,30 @@ class SanPham extends Model
     public function binhluan()
     {
         return $this->hasMany(BinhLuan::class, 'id_sp');
+    }
+
+    /**
+     * Tính tổng tồn kho = Số lượng sản phẩm chính + Tổng số lượng tất cả variant
+     */
+    public function getTotalStockAttribute()
+    {
+        // Số lượng sản phẩm chính
+        $mainStock = $this->soLuong ?? 0;
+        
+        // Tổng số lượng tất cả variant
+        $variantStock = $this->chitietsanpham()
+            ->whereNull('deleted_at')
+            ->sum('soLuong');
+        
+        return $mainStock + $variantStock;
+    }
+
+    /**
+     * Kiểm tra có đủ tồn kho không
+     */
+    public function hasEnoughStock($quantity)
+    {
+        return $this->total_stock >= $quantity;
     }
 }
 

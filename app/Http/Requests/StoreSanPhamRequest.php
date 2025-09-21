@@ -45,16 +45,16 @@ class StoreSanPhamRequest extends FormRequest
             'id_danhmuc'        => 'required|integer|exists:danhmuc,id',
             'moTa'              => 'nullable|string',
             'status'            => 'nullable|in:0,1',
-            // 'soLuong' is not used; stock is managed per-size
+            'soLuong'           => 'nullable|integer|min:0',
             // Giá mặc định cấp sản phẩm (áp cho biến thể nếu không nhập)
             'base_price'        => 'nullable|numeric|min:0',
             'base_sale_price'   => 'nullable|numeric|min:0',
             // Biến thể với cấu trúc mới
             'variants.*.ten'                    => 'nullable|string|max:255',
             'variants.*.mausac'                 => 'nullable|integer|exists:mausac,id',
-            'variants.*.sizes.*.size'           => 'required|integer|exists:size,id',
+            'variants.*.sizes.*.size'           => 'nullable|integer|exists:size,id',
             'variants.*.sizes.*.so_luong'       => 'nullable|integer|min:0',
-            'variants.*.sizes.*.gia'            => 'required|numeric|min:0',
+            'variants.*.sizes.*.gia'            => 'nullable|numeric|min:0',
             'variants.*.sizes.*.gia_khuyenmai'  => 'nullable|numeric|min:0',
             // Hình ảnh
             // Cho phép bỏ trống khi người dùng submit lại sau khi lỗi validate các trường khác
@@ -75,6 +75,7 @@ class StoreSanPhamRequest extends FormRequest
             'id_danhmuc' => 'Danh mục',
             'moTa' => 'Mô tả',
             'status' => 'Trạng thái',
+            'soLuong' => 'Số lượng sản phẩm chính',
             'image_main' => 'Hình ảnh chính',
             'image_extra.*' => 'Hình ảnh phụ',
             'variants.*.ten' => 'Tên biến thể',

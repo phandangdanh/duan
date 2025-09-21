@@ -5,8 +5,12 @@
     if(isset($sanphams)){
         $iterable = method_exists($sanphams, 'items') ? collect($sanphams->items()) : collect($sanphams);
         foreach($iterable as $p){
-            $sum = $p->chitietsanpham->sum('soLuong');
-            if($sum > 0) { $pageInStock++; } else { $pageOutOfStock++; }
+            // Tổng tồn kho = Số lượng sản phẩm chính + Tổng số lượng variant
+            $mainStock = $p->soLuong ?? 0;
+            $variantStock = $p->chitietsanpham->sum('soLuong');
+            $totalStock = $mainStock + $variantStock;
+            
+            if($totalStock > 0) { $pageInStock++; } else { $pageOutOfStock++; }
         }
     }
 @endphp
@@ -103,10 +107,19 @@
                 </td>
                         <td>
                             @php
-                                $totalStock = $sanpham->chitietsanpham->sum('soLuong');
+                                // Tổng tồn kho = Số lượng sản phẩm chính + Tổng số lượng variant
+                                $mainStock = $sanpham->soLuong ?? 0;
+                                $variantStock = $sanpham->chitietsanpham->sum('soLuong');
+                                $totalStock = $mainStock + $variantStock;
                             @endphp
                             @if($totalStock > 0)
                                 <span class="badge badge-success">Còn hàng ({{ $totalStock }})</span>
+                                @if($mainStock > 0)
+                                    <br><small class="text-muted">Chính: {{ $mainStock }}</small>
+                                @endif
+                                @if($variantStock > 0)
+                                    <br><small class="text-muted">Variant: {{ $variantStock }}</small>
+                                @endif
                             @else
                                 <span class="badge badge-danger">Hết hàng</span>
                             @endif

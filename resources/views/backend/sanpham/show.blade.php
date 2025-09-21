@@ -443,8 +443,11 @@
                         <td>Trạng thái</td>
                         <td>
                             @php
-                                // Kiểm tra trạng thái dựa trên chi tiết sản phẩm
-                                $hasStock = $sanpham->chitietsanpham->where('soluong', '>', 0)->count() > 0;
+                                // Kiểm tra trạng thái dựa trên tổng tồn kho (sản phẩm chính + variant)
+                                $mainStock = $sanpham->soLuong ?? 0;
+                                $variantStock = $sanpham->chitietsanpham->sum('soLuong');
+                                $totalStock = $mainStock + $variantStock;
+                                $hasStock = $totalStock > 0;
                                 $hasDetails = $sanpham->chitietsanpham->count() > 0;
                             @endphp
                             
@@ -534,8 +537,20 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($chitiet->soluong > 0)
-                                            <span class="badge bg-success">{{ number_format($chitiet->soluong) }}</span>
+                                        @php
+                                            // Tổng tồn kho = Số lượng sản phẩm chính + Số lượng variant hiện tại
+                                            $mainStock = $sanpham->soLuong ?? 0;
+                                            $variantStock = $chitiet->soluong ?? 0;
+                                            $totalStock = $mainStock + $variantStock;
+                                        @endphp
+                                        @if($totalStock > 0)
+                                            <span class="badge bg-success">{{ number_format($totalStock) }}</span>
+                                            @if($mainStock > 0)
+                                                <br><small class="text-muted">Chính: {{ $mainStock }}</small>
+                                            @endif
+                                            @if($variantStock > 0)
+                                                <br><small class="text-muted">Variant: {{ $variantStock }}</small>
+                                            @endif
                                         @else
                                             <span class="badge bg-danger">Hết hàng</span>
                                         @endif
@@ -564,7 +579,13 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($chitiet->soluong > 0)
+                                        @php
+                                            // Tổng tồn kho = Số lượng sản phẩm chính + Số lượng variant hiện tại
+                                            $mainStock = $sanpham->soLuong ?? 0;
+                                            $variantStock = $chitiet->soluong ?? 0;
+                                            $totalStock = $mainStock + $variantStock;
+                                        @endphp
+                                        @if($totalStock > 0)
                                             <span class="badge bg-success">Còn hàng</span>
                                         @else
                                             <span class="badge bg-danger">Hết hàng</span>

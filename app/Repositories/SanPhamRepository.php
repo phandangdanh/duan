@@ -142,6 +142,21 @@ class SanPhamRepository implements SanPhamRepositoryInterface
                 $query->where('trangthai', (int) $filters['status']);
             }
 
+            // lọc sản phẩm có hình ảnh
+            if (!$hasKeyword && !empty($filters['has_image']) && $filters['has_image']) {
+                $query->whereExists(function ($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('sanpham_hinhanh')
+                        ->whereColumn('sanpham.id', 'sanpham_hinhanh.sanpham_id')
+                        ->whereNull('sanpham_hinhanh.deleted_at');
+                });
+            }
+
+            // lọc sản phẩm đang khuyến mãi (có base_sale_price < base_price)
+            if (!$hasKeyword && !empty($filters['on_sale']) && $filters['on_sale']) {
+                $query->whereRaw('base_sale_price < base_price AND base_sale_price > 0');
+            }
+
             // lọc theo tồn kho (bỏ qua khi có keyword)
             if (!$hasKeyword && !empty($filters['stock']) && $filters['stock'] !== '' && $filters['stock'] !== null) {
                 if ($filters['stock'] === 'in_stock') {
@@ -210,28 +225,16 @@ class SanPhamRepository implements SanPhamRepositoryInterface
                     $query->orderBy('maSP', 'asc');
                     break;
                 case 'gia_asc':
-                    if (!$hasKeyword) {
-                        $query->join('chitietsanpham', 'sanpham.id', '=', 'chitietsanpham.id_sp')
-                              ->orderBy('chitietsanpham.gia', 'asc')
-                              ->select('sanpham.*');
-                    } else {
-                        $query->orderByDesc('id');
-                    }
-                    break;
                 case 'gia_desc':
-                    if (!$hasKeyword) {
-                        $query->join('chitietsanpham', 'sanpham.id', '=', 'chitietsanpham.id_sp')
-                              ->orderBy('chitietsanpham.gia', 'desc')
-                              ->select('sanpham.*');
-                    } else {
-                        $query->orderByDesc('id');
-                    }
+                    // Sắp xếp theo giá sẽ được xử lý sau khi load dữ liệu
+                    $query->orderByDesc('id');
                     break;
                 default:
                     $query->orderByDesc('id');
                     break;
             }
 
+            
             if ($perPage === 'all') {
                 // Log SQL trước khi chạy
                 try {
@@ -248,23 +251,92 @@ class SanPhamRepository implements SanPhamRepositoryInterface
             // Đảm bảo perPage là số nguyên
             $perPage = (int) $perPage;
             if ($perPage <= 0) {
-                $perPage = 10; // Giá trị mặc định
+                $perPage = 12; // Giá trị mặc định
             }
 
-
-
             try {
-                // Đếm tổng số dòng khớp trước khi phân trang để dễ debug
-                $totalMatched = (clone $query)->count();
-                Log::info('SanPham search (paginate) SQL', [
-                    'sql' => $query->toSql(),
-                    'bindings' => $query->getBindings(),
-                    'keyword' => $keyword,
-                    'total_matched' => $totalMatched
-                ]);
-            } catch (\Throwable $e) {}
-            $paginator = $query->paginate($perPage);
-            $paginator->appends(array_filter($filters, fn($v) => $v !== null && $v !== ''));
+                // Kiểm tra nếu cần sắp xếp theo giá
+                $needsPriceSorting = in_array($filters['sort'] ?? '', ['gia_asc', 'gia_desc']);
+                
+                if ($needsPriceSorting) {
+                    // Lấy tất cả sản phẩm và sắp xếp theo giá
+                    $allItems = $query->get();
+                    
+                    // Load relations cho tất cả sản phẩm
+                    $allItems->load(['danhmuc', 'hinhanh', 'chitietsanpham']);
+                    
+                    // Sắp xếp theo giá
+                    $sortedItems = $allItems->sortBy(function($product) use ($filters) {
+                        $basePrice = $product->base_price ?? 0;
+                        if ($basePrice > 0) {
+                            return $basePrice;
+                        }
+                        
+                        // Fallback về variant prices
+                        $variantPrices = $product->chitietsanpham
+                            ->map(function($d){
+                                $price = $d->gia_khuyenmai && $d->gia_khuyenmai > 0 ? $d->gia_khuyenmai : $d->gia;
+                                return is_null($price) ? 0 : (float)$price;
+                            })
+                            ->filter(function($v){ return $v > 0; });
+                            
+                        return $variantPrices->min() ?? 0;
+                    });
+                    
+                    // Đảo ngược nếu là giảm dần
+                    if (($filters['sort'] ?? '') === 'gia_desc') {
+                        $sortedItems = $sortedItems->reverse();
+                    }
+                    
+                    // Tạo paginator thủ công
+                    $currentPage = request('page', 1);
+                    $offset = ($currentPage - 1) * $perPage;
+                    $items = $sortedItems->slice($offset, $perPage);
+                    
+                    $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                        $items,
+                        $sortedItems->count(),
+                        $perPage,
+                        $currentPage,
+                        [
+                            'path' => request()->url(),
+                            'pageName' => 'page',
+                        ]
+                    );
+                    $paginator->appends(array_filter($filters, fn($v) => $v !== null && $v !== ''));
+                } else {
+                    // Sắp xếp bình thường, sử dụng paginate
+                    $totalMatched = (clone $query)->count();
+                    Log::info('SanPham search (paginate) SQL', [
+                        'sql' => $query->toSql(),
+                        'bindings' => $query->getBindings(),
+                        'keyword' => $keyword,
+                        'total_matched' => $totalMatched
+                    ]);
+                    $paginator = $query->paginate($perPage);
+                    $paginator->appends(array_filter($filters, fn($v) => $v !== null && $v !== ''));
+                }
+            } catch (\Throwable $e) {
+                Log::error('SanPhamRepository pagination error: ' . $e->getMessage());
+                // Fallback: lấy tất cả và tạo paginator thủ công
+                $allItems = $query->get();
+                $currentPage = request('page', 1);
+                $offset = ($currentPage - 1) * $perPage;
+                $items = $allItems->slice($offset, $perPage);
+                
+                $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                    $items,
+                    $allItems->count(),
+                    $perPage,
+                    $currentPage,
+                    [
+                        'path' => request()->url(),
+                        'pageName' => 'page',
+                    ]
+                );
+                $paginator->appends(array_filter($filters, fn($v) => $v !== null && $v !== ''));
+            }
+            
             return ['items' => $paginator, 'pagination' => $paginator];
             
         } catch (\Exception $e) {

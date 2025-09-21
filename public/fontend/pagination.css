@@ -1,0 +1,157 @@
+/* Pagination CSS Fix - Bootstrap Style */
+
+/* Target the pagination container */
+nav[role="navigation"][aria-label="Pagination Navigation"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 20px 0 !important;
+  width: 100% !important;
+}
+
+/* Style the main pagination container */
+nav[role="navigation"] .d-none.d-sm-flex {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  gap: 20px !important;
+}
+
+/* Style the pagination ul */
+nav[role="navigation"] .pagination {
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+}
+
+/* Style pagination items */
+nav[role="navigation"] .page-item {
+  display: inline-block !important;
+  margin: 0 !important;
+}
+
+/* Style pagination links */
+nav[role="navigation"] .page-link {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  background: white !important;
+  color: #0d6efd !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Active page styling */
+nav[role="navigation"] .page-item.active .page-link {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: white !important;
+  cursor: default !important;
+}
+
+/* Disabled page styling */
+nav[role="navigation"] .page-item.disabled .page-link {
+  color: #6c757d !important;
+  background-color: #fff !important;
+  border-color: #dee2e6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Hover effects */
+nav[role="navigation"] .page-item:not(.disabled):not(.active) .page-link:hover {
+  background-color: #e9ecef !important;
+  border-color: #dee2e6 !important;
+  color: #0d6efd !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Style the results text */
+nav[role="navigation"] .text-muted {
+  font-size: 14px !important;
+  color: #6c757d !important;
+  margin: 0 !important;
+}
+
+/* Mobile pagination */
+nav[role="navigation"] .d-flex.d-sm-none {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  margin: 20px 0 !important;
+}
+
+nav[role="navigation"] .d-flex.d-sm-none .btn {
+  padding: 8px 16px !important;
+  font-size: 14px !important;
+  border-radius: 8px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  nav[role="navigation"] .page-link {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+    min-width: 32px !important;
+    height: 32px !important;
+  }
+  
+  nav[role="navigation"] .text-muted {
+    font-size: 12px !important;
+  }
+  
+  nav[role="navigation"] .d-none.d-sm-flex {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+}
+
+/* Hide any oversized elements */
+nav[role="navigation"] [class*="arrow"],
+nav[role="navigation"] [class*="chevron"],
+nav[role="navigation"] .fa,
+nav[role="navigation"] .bi {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Hide any large chevron icons that might appear */
+.chevron-left,
+.chevron-right,
+.arrow-left,
+.arrow-right,
+[class*="chevron"],
+[class*="arrow"] {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Force hide any large icons in pagination area */
+nav[role="navigation"] * {
+  max-width: 50px !important;
+  max-height: 50px !important;
+}
+
+/* Ensure pagination text is normal size */
+nav[role="navigation"] .page-link {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+/* Hide any elements with large dimensions */
+nav[role="navigation"] *[style*="width: 100px"],
+nav[role="navigation"] *[style*="height: 100px"],
+nav[role="navigation"] *[style*="font-size: 50px"] {
+  display: none !important;
+}

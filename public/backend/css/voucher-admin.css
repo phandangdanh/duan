@@ -1358,7 +1358,7 @@
 }
 
 .alert-danger {
-    background: linear-gradient(45deg, #f8d7da, #f5c6cb);
+    background:  #dc3545;
     color: #721c24;
     border-left: 4px solid #dc3545;
 }

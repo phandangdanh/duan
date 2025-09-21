@@ -93,4 +93,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         return UserModel::whereIn('id', $ids)->update(['user_catalogue_id' => $role]);
     }
 
+    public function findByEmail(string $email)
+    {
+        return UserModel::where('email', $email)->first();
+    }
 }

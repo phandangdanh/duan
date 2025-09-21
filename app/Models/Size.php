@@ -10,7 +10,7 @@ class Size extends Model
     use HasFactory;
 
     protected $table = 'size';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'ten',

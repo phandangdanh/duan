@@ -111,9 +111,9 @@
                  </ul>
              </li>
              <li>
-                 <a href="login.html">
-                     <i class="fa fa-sign-out"></i> Log out
-                 </a>
+                <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">
+                    <i class="fa fa-sign-out"></i> Log out
+                </a>
              </li>
          </ul>
      </nav>

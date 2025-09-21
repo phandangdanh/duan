@@ -20,6 +20,7 @@ class UpdateSanPhamRequest extends FormRequest
             'id_danhmuc'        => 'required|integer|exists:danhmuc,id',
             'moTa'              => 'nullable|string',
             'status'            => 'nullable|in:0,1',
+            'soLuong'           => 'nullable|integer|min:0',
             'base_price'        => 'nullable|numeric|min:0',
             'base_sale_price'   => 'nullable|numeric|min:0',
             'variants.*.ten'                    => 'nullable|string|max:255',
@@ -41,6 +42,7 @@ class UpdateSanPhamRequest extends FormRequest
             'id_danhmuc' => 'Danh mục',
             'moTa' => 'Mô tả',
             'status' => 'Trạng thái',
+            'soLuong' => 'Số lượng sản phẩm chính',
             'image_main' => 'Hình ảnh chính',
             'image_extra.*' => 'Hình ảnh phụ',
         ];

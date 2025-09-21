@@ -12,6 +12,15 @@
         <li class="nav-item"><a class="nav-link" href="{{ url('/contact') }}">Liên hệ</a></li>
       </ul>
       <div class="d-flex align-items-center">
+        <!-- Giỏ hàng -->
+        <a href="{{ route('cart') }}" class="btn btn-outline-dark me-3 position-relative">
+          <i class="fas fa-shopping-cart me-1"></i>
+          Giỏ hàng
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count" style="font-size: 0.7rem;">
+            0
+          </span>
+        </a>
+        
         @auth
           <div class="dropdown me-2">
             <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">

@@ -53,6 +53,52 @@ class DonHangService
         return $stats;
     }
 
+    /**
+     * Tạo đơn hàng mới
+     */
+    public function createOrder(array $data)
+    {
+        return DB::transaction(function () use ($data) {
+            // Tạo đơn hàng
+            $order = DonHang::create([
+                'id_user' => $data['id_user'],
+                'trangthai' => DonHang::TRANGTHAI_CHO_XAC_NHAN,
+                'ngaytao' => now(),
+                'tongtien' => $data['tongtien'],
+                'hoten' => $data['hoten'],
+                'email' => $data['email'],
+                'sodienthoai' => $data['sodienthoai'],
+                'diachigiaohang' => $data['diachigiaohang'],
+                'phuongthucthanhtoan' => $data['phuongthucthanhtoan'] ?? 'cod',
+                'trangthaithanhtoan' => 'chua_thanh_toan',
+                'ghichu' => $data['ghichu'] ?? null,
+            ]);
+
+            // Tạo chi tiết đơn hàng
+            foreach ($data['chi_tiet_don_hang'] as $detail) {
+                ChiTietDonHang::create([
+                    'id_donhang' => $order->id,
+                    'id_chitietsanpham' => $detail['id_chitietsanpham'],
+                    'tensanpham' => $detail['tensanpham'],
+                    'dongia' => $detail['dongia'],
+                    'soluong' => $detail['soluong'],
+                    'thanhtien' => $detail['thanhtien'],
+                    'ghichu' => $detail['ghichu'],
+                ]);
+            }
+
+            return $order;
+        });
+    }
+
+    /**
+     * Lấy đơn hàng theo ID
+     */
+    public function getOrderById($id)
+    {
+        return DonHang::with(['chiTietDonHang', 'user'])->find($id);
+    }
+
     public function getDonHangList($filters = [])
     {
         $query = DonHang::with(['user', 'chiTietDonHang', 'donHangVoucher.voucher'])

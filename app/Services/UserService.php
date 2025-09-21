@@ -11,15 +11,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeEmail;
 
 class UserService implements UserServiceInterface
 {
     protected $userRepository;
-    protected $userRepoUserRepositoryInterface;
-    public function __construct(UserRepository $userRepository,UserRepositoryInterface $userRepoUserRepositoryInterface)
+    public function __construct(UserRepositoryInterface $userRepository)
     {
         $this->userRepository = $userRepository;
-        $this->userRepoUserRepositoryInterface = $userRepoUserRepositoryInterface;
     }
 
     public function paginate()
@@ -67,13 +67,134 @@ class UserService implements UserServiceInterface
             }
 
 
+            // Đảm bảo user_catalogue_id được set (mặc định là 2 = user thường)
+            if (!isset($payload['user_catalogue_id'])) {
+                $payload['user_catalogue_id'] = 2; // 2 = user thường
+            }
+
             $user = $this->userRepository->create($payload);
+
+            // Tự động tạo token cho user mới được tạo bởi admin
+            try {
+                $token = $user->createToken('admin-created-token')->plainTextToken;
+                Log::info("Token created for admin-created user ID: {$user->id}");
+            } catch (\Exception $e) {
+                Log::error("Failed to create token for user ID {$user->id}: " . $e->getMessage());
+                // Không throw exception vì việc tạo user đã thành công
+            }
 
             DB::commit();
             return $user;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('User create failed: '.$e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Xóa tất cả token của user
+     */
+    public function revokeAllTokens($userId)
+    {
+        try {
+            $user = $this->userRepository->find($userId);
+            if ($user) {
+                $deletedCount = $user->tokens()->delete();
+                Log::info("Revoked {$deletedCount} tokens for user ID: {$userId}");
+                return $deletedCount;
+            }
+            return 0;
+        } catch (\Exception $e) {
+            Log::error("Failed to revoke tokens for user ID {$userId}: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Xóa token cụ thể của user
+     */
+    public function revokeToken($userId, $tokenId)
+    {
+        try {
+            $user = $this->userRepository->find($userId);
+            if ($user) {
+                $deleted = $user->tokens()->where('id', $tokenId)->delete();
+                Log::info("Revoked token ID {$tokenId} for user ID: {$userId}");
+                return $deleted > 0;
+            }
+            return false;
+        } catch (\Exception $e) {
+            Log::error("Failed to revoke token {$tokenId} for user ID {$userId}: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Lấy danh sách token của user
+     */
+    public function getUserTokens($userId)
+    {
+        try {
+            $user = $this->userRepository->find($userId);
+            if ($user) {
+                return $user->tokens()->get();
+            }
+            return collect();
+        } catch (\Exception $e) {
+            Log::error("Failed to get tokens for user ID {$userId}: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Xóa tất cả token của user (dùng khi xóa user)
+     */
+    public function deleteUserTokens($userId)
+    {
+        try {
+            $user = $this->userRepository->find($userId);
+            if ($user) {
+                $deletedCount = $user->tokens()->delete();
+                Log::info("Deleted {$deletedCount} tokens for user ID: {$userId}");
+                return $deletedCount;
+            }
+            return 0;
+        } catch (\Exception $e) {
+            Log::error("Failed to delete tokens for user ID {$userId}: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function registerFrontend(array $data, ?string $userAgent = null, ?string $ip = null)
+    {
+        DB::beginTransaction();
+        try {
+            $payload = [
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'status' => 1, // Kích hoạt ngay lập tức
+                'user_agent' => $userAgent,
+                'ip' => $ip,
+                'user_catalogue_id' => 2,
+            ];
+
+            $user = $this->userRepository->create($payload);
+
+            // Gửi email chào mừng
+            $userNameEmail = $user->email; // Email làm tên tài khoản
+            $userPassword = $data['password']; // Mật khẩu từ dữ liệu đăng ký ban đầu
+            $shopName = config('app.name');
+            $realUserName = $data['name']; // Tên người dùng thật
+
+            Mail::to($user->email)->send(new WelcomeEmail($userNameEmail, $userPassword, $shopName, $realUserName));
+
+            DB::commit();
+            return $user->fresh();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Register frontend failed: '.$e->getMessage());
             throw $e;
         }
     }
@@ -116,18 +237,26 @@ class UserService implements UserServiceInterface
         $user = $this->userRepository->findById($id);
         if (!$user) return false;
 
-       // Trong delete()
-if ($user->image && file_exists(public_path('uploads/' . $user->image))) {
-    unlink(public_path('uploads/' . $user->image));
-}
+        // Xóa ảnh đại diện
+        if ($user->image && file_exists(public_path('uploads/' . $user->image))) {
+            unlink(public_path('uploads/' . $user->image));
+        }
 
+        // Xóa tất cả token của user trước khi xóa user
+        try {
+            $user->tokens()->delete();
+            Log::info("Deleted all tokens for user ID: {$id}");
+        } catch (\Exception $e) {
+            Log::error("Failed to delete tokens for user ID {$id}: " . $e->getMessage());
+            // Không throw exception vì việc xóa user vẫn cần tiếp tục
+        }
 
         return $this->userRepository->delete($id);
     }
 
     public function toggleStatus($id, $status)
     {
-        $user = $this->userRepoUserRepositoryInterface->find($id);
+        $user = $this->userRepository->find($id);
         if (!$user) return false;
         $user->status = $status;
         $user->save();
@@ -141,6 +270,19 @@ if ($user->image && file_exists(public_path('uploads/' . $user->image))) {
 
     public function deleteMany(array $ids)
     {
+        // Xóa token của tất cả user trước khi xóa
+        foreach ($ids as $id) {
+            try {
+                $user = $this->userRepository->findById($id);
+                if ($user) {
+                    $user->tokens()->delete();
+                    Log::info("Deleted all tokens for user ID: {$id}");
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed to delete tokens for user ID {$id}: " . $e->getMessage());
+            }
+        }
+
         return $this->userRepository->deleteMany($ids);
     }
 
@@ -203,5 +345,37 @@ if ($user->image && file_exists(public_path('uploads/' . $user->image))) {
     public function getRecentUsers(int $limit = 10)
     {
         return UserModel::orderBy('created_at', 'desc')->limit($limit)->get(['id','name','email','created_at','status','user_catalogue_id']);
+    }
+
+    /**
+     * Xử lý logic đăng nhập cho frontend.
+     * @param array $credentials ['email', 'password']
+     * @return \App\Models\UserModel|null Trả về đối tượng người dùng nếu đăng nhập thành công, ngược lại null.
+     * @throws \Exception
+     */
+    public function loginFrontend(array $credentials)
+    {
+        $user = $this->userRepository->findByEmail($credentials['email']);
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return null; // Đăng nhập thất bại
+        }
+
+        // Bỏ kiểm tra trạng thái người dùng vì đã kích hoạt mặc định khi đăng ký
+        // Tất cả người dùng đều có thể đăng nhập
+
+        return $user;
+    }
+
+    /**
+     * Xử lý logic đăng xuất của người dùng.
+     */
+    public function logoutUser(): void
+    {
+        auth()->logout();
+
+        request()->session()->invalidate();
+
+        request()->session()->regenerateToken();
     }
 }

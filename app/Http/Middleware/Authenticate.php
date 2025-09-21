@@ -21,14 +21,18 @@ class Authenticate extends Middleware
         $response = parent::handle($request, $next, ...$guards);
 
         // Nếu đã đăng nhập và user bị khóa
-        if (auth()->check() && auth()->user()->status != 1) {
-            auth()->logout();
-            // Nếu là request ajax
-            if ($request->expectsJson()) {
-                return response()->json(['message' => 'Tài khoản đã bị khóa!'], 403);
+        if (auth()->check()) {
+            $user = auth()->user();
+            // Chỉ kiểm tra status nếu user có status field và status != 1
+            if (isset($user->status) && $user->status != 1) {
+                auth()->logout();
+                // Nếu là request ajax
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Tài khoản đã bị khóa!'], 403);
+                }
+                // Nếu là request bình thường
+                return redirect()->route('login')->withErrors(['Tài khoản đã bị khóa!']);
             }
-            // Nếu là request bình thường
-            return redirect()->route('login')->withErrors(['Tài khoản đã bị khóa!']);
         }
 
         return $response;
