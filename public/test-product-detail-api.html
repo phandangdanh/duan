@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Product Detail API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Product Detail API</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>API Endpoints Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="productId" class="form-label">Product ID:</label>
+                            <input type="number" id="productId" class="form-control" value="1" min="1">
+                        </div>
+                        <button class="btn btn-primary mb-2" onclick="testProductDetail()">Test Product Detail</button>
+                        <button class="btn btn-success mb-2" onclick="testRelatedProducts()">Test Related Products</button>
+                        <button class="btn btn-info mb-2" onclick="testProductStock()">Test Product Stock</button>
+                        <button class="btn btn-warning mb-2" onclick="testAllProductAPIs()">Test All APIs</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="results" style="max-height: 400px; overflow-y: auto;">
+                            <p class="text-muted">Click buttons to test API endpoints...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Product Detail Pages</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary" onclick="openProductDetailAPI()">View API Product Detail</button>
+                        <button class="btn btn-outline-primary" onclick="openProductDetailOriginal()">View Original Product Detail</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load API System -->
+    <script src="/fontend/js/api/index.js"></script>
+    <script src="/fontend/js/api/product-detail-api-client.js"></script>
+
+    <script>
+        let productDetailApi = null;
+
+        function logResult(message, data = null) {
+            const resultsDiv = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'mb-2 p-2 border rounded';
+            logEntry.innerHTML = `
+                <small class="text-muted">[${timestamp}]</small>
+                <strong>${message}</strong>
+                ${data ? `<pre class="mt-2 small">${JSON.stringify(data, null, 2)}</pre>` : ''}
+            `;
+            resultsDiv.insertBefore(logEntry, resultsDiv.firstChild);
+        }
+
+        function getProductId() {
+            return document.getElementById('productId').value;
+        }
+
+        async function testProductDetail() {
+            try {
+                const productId = getProductId();
+                logResult(`Testing getProductDetail(${productId})...`);
+                
+                if (!productDetailApi) {
+                    productDetailApi = new ProductDetailApiClient();
+                }
+                
+                const data = await productDetailApi.getProductDetail(productId);
+                logResult('✅ getProductDetail() success', data);
+            } catch (error) {
+                logResult('❌ getProductDetail() error', { error: error.message });
+            }
+        }
+
+        async function testRelatedProducts() {
+            try {
+                const productId = getProductId();
+                logResult(`Testing getRelatedProducts(${productId})...`);
+                
+                if (!productDetailApi) {
+                    productDetailApi = new ProductDetailApiClient();
+                }
+                
+                // First get product detail to get category
+                const productData = await productDetailApi.getProductDetail(productId);
+                if (productData.success) {
+                    const categoryId = productData.data.id_danhmuc;
+                    const data = await productDetailApi.getRelatedProducts(categoryId, productId, 4);
+                    logResult('✅ getRelatedProducts() success', data);
+                } else {
+                    logResult('❌ Cannot get product detail for related products', productData);
+                }
+            } catch (error) {
+                logResult('❌ getRelatedProducts() error', { error: error.message });
+            }
+        }
+
+        async function testProductStock() {
+            try {
+                const productId = getProductId();
+                logResult(`Testing getProductStock(${productId})...`);
+                
+                if (!productDetailApi) {
+                    productDetailApi = new ProductDetailApiClient();
+                }
+                
+                const data = await productDetailApi.getProductStock(productId);
+                logResult('✅ getProductStock() success', data);
+            } catch (error) {
+                logResult('❌ getProductStock() error', { error: error.message });
+            }
+        }
+
+        async function testAllProductAPIs() {
+            try {
+                const productId = getProductId();
+                logResult(`Testing all product APIs for ID ${productId}...`);
+                
+                if (!productDetailApi) {
+                    productDetailApi = new ProductDetailApiClient();
+                }
+                
+                // Test product detail
+                const productData = await productDetailApi.getProductDetail(productId);
+                logResult('✅ Product Detail API', productData);
+                
+                if (productData.success) {
+                    // Test related products
+                    const categoryId = productData.data.id_danhmuc;
+                    const relatedData = await productDetailApi.getRelatedProducts(categoryId, productId, 4);
+                    logResult('✅ Related Products API', relatedData);
+                    
+                    // Test stock
+                    const stockData = await productDetailApi.getProductStock(productId);
+                    logResult('✅ Product Stock API', stockData);
+                }
+                
+            } catch (error) {
+                logResult('❌ Test All APIs error', { error: error.message });
+            }
+        }
+
+        function openProductDetailAPI() {
+            const productId = getProductId();
+            window.open(`/sanpham-api/${productId}`, '_blank');
+        }
+
+        function openProductDetailOriginal() {
+            const productId = getProductId();
+            window.open(`/sanpham/${productId}`, '_blank');
+        }
+
+        // Test API connection on page load
+        document.addEventListener('apiReady', function(event) {
+            logResult('🎉 API System Ready!', { api: 'Available' });
+            productDetailApi = new ProductDetailApiClient();
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            logResult('📄 Page loaded, waiting for API...');
+        });
+    </script>
+</body>
+</html>

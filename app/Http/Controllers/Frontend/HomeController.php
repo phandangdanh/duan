@@ -67,6 +67,14 @@ class HomeController extends Controller
     }
 
     /**
+     * Hiển thị trang chủ sử dụng API
+     */
+    public function indexApi()
+    {
+        return view('fontend.home.trangchu-api');
+    }
+
+    /**
      * Lấy sản phẩm nổi bật
      * 
      * Sản phẩm nổi bật được lấy theo tiêu chí:

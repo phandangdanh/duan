@@ -506,4 +506,261 @@ class ApiOrderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Hủy đơn hàng (chỉ user sở hữu đơn hàng)
+     */
+    public function cancel(Request $request, $id)
+    {
+        try {
+            $user = $request->user();
+            
+            $order = $this->apiOrderService->getOrderById((int)$id);
+            
+            if (!$order) {
+                return response()->json([
+                    'status_code' => 404,
+                    'message' => 'Không tìm thấy đơn hàng với ID: ' . $id
+                ], 404);
+            }
+
+            // Kiểm tra quyền sở hữu
+            if ($order->id_user !== $user->id) {
+                return response()->json([
+                    'status_code' => 403,
+                    'message' => 'Bạn không có quyền hủy đơn hàng này'
+                ], 403);
+            }
+
+            // Chỉ cho phép hủy đơn hàng ở trạng thái chờ xác nhận hoặc đã xác nhận
+            if (!in_array($order->trangthai, ['cho_xac_nhan', 'da_xac_nhan'])) {
+                return response()->json([
+                    'status_code' => 400,
+                    'message' => 'Không thể hủy đơn hàng ở trạng thái này'
+                ], 400);
+            }
+
+            $result = $this->apiOrderService->cancelOrder((int)$id);
+            
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Đơn hàng đã được hủy thành công'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('ApiOrderController@cancel: ' . $e->getMessage());
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Lỗi server khi hủy đơn hàng',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Mua lại đơn hàng (thêm vào giỏ hàng)
+     */
+    public function reorder(Request $request, $id)
+    {
+        try {
+            $user = $request->user();
+            
+            $order = $this->apiOrderService->getOrderById((int)$id);
+            
+            if (!$order) {
+                return response()->json([
+                    'status_code' => 404,
+                    'message' => 'Không tìm thấy đơn hàng với ID: ' . $id
+                ], 404);
+            }
+
+            // Kiểm tra quyền sở hữu
+            if ($order->id_user !== $user->id) {
+                return response()->json([
+                    'status_code' => 403,
+                    'message' => 'Bạn không có quyền mua lại đơn hàng này'
+                ], 403);
+            }
+
+            $result = $this->apiOrderService->reorderOrder((int)$id, $user->id);
+            
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Đã thêm sản phẩm vào giỏ hàng',
+                'data' => $result
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('ApiOrderController@reorder: ' . $e->getMessage());
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Lỗi server khi mua lại đơn hàng',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Lấy đơn hàng của user hiện tại
+     */
+    public function myOrders(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $perPage = $request->input('per_page', 10);
+            
+            $result = $this->apiOrderService->getUserOrders($user->id, $perPage);
+            
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Lấy danh sách đơn hàng thành công',
+                'data' => $result['data'],
+                'pagination' => $result['pagination']
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('ApiOrderController@myOrders: ' . $e->getMessage());
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Lỗi server khi lấy danh sách đơn hàng',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Lịch sử đơn hàng của user
+     */
+    public function orderHistory(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $perPage = $request->input('per_page', 20);
+            $status = $request->input('status');
+            
+            $result = $this->apiOrderService->getUserOrderHistory($user->id, $perPage, $status);
+            
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Lấy lịch sử đơn hàng thành công',
+                'data' => $result['data'],
+                'pagination' => $result['pagination']
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('ApiOrderController@orderHistory: ' . $e->getMessage());
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Lỗi server khi lấy lịch sử đơn hàng',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Cập nhật trạng thái đơn hàng (chỉ admin)
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'trangthai' => 'required|string|in:cho_xac_nhan,da_xac_nhan,dang_giao,da_giao,da_huy,hoan_tra',
+                'ghichu' => 'nullable|string|max:500'
+            ]);
+
+            $order = $this->apiOrderService->updateOrderStatus((int)$id, $validated);
+            
+            if (!$order) {
+                return response()->json([
+                    'status_code' => 404,
+                    'message' => 'Không tìm thấy đơn hàng với ID: ' . $id
+                ], 404);
+            }
+            
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Cập nhật trạng thái đơn hàng thành công',
+                'data' => new OrderResource($order)
+            ]);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status_code' => 422,
+                'message' => 'Dữ liệu không hợp lệ',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('ApiOrderController@updateStatus: ' . $e->getMessage());
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Lỗi server khi cập nhật trạng thái đơn hàng',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Kiểm tra trạng thái thanh toán (public - không cần đăng nhập)
+     */
+    public function checkPayment(Request $request)
+    {
+        try {
+            $orderId = $request->input('order_id');
+            $phone = $request->input('phone');
+            
+            if (!$orderId || !$phone) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng nhập đầy đủ mã đơn hàng và số điện thoại'
+                ]);
+            }
+            
+            // Find order by ID and phone
+            $order = \App\Models\DonHang::where('id', $orderId)
+                                        ->where('sodienthoai', $phone)
+                                        ->first();
+            
+            if (!$order) {
+                // Debug: Check if order exists with different phone
+                $orderById = \App\Models\DonHang::where('id', $orderId)->first();
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy đơn hàng với thông tin đã nhập',
+                    'debug' => [
+                        'searched_order_id' => $orderId,
+                        'searched_phone' => $phone,
+                        'order_exists' => $orderById ? true : false,
+                        'actual_phone' => $orderById ? $orderById->sodienthoai : null,
+                        'suggestion' => $orderById ? "Thử với số điện thoại: " . $orderById->sodienthoai : "Đơn hàng không tồn tại"
+                    ]
+                ]);
+            }
+            
+            // Return order data with payment status
+            return response()->json([
+                'success' => true,
+                'order' => [
+                    'id' => $order->id,
+                    'tongtien' => $order->tongtien,
+                    'status' => $order->trangthaithanhtoan ?? 0, // 0=chưa, 1=thành công, 2=thất bại
+                    'ngaytao' => $order->created_at ? $order->created_at->toISOString() : null,
+                    'tenkhachhang' => $order->hoten,
+                    'sdt' => $order->sodienthoai,
+                    'diachi' => $order->diachigiaohang,
+                    'payment_method' => $order->phuongthucthanhtoan,
+                    'transaction_id' => $order->transaction_id ?? null,
+                    'payment_time' => $order->payment_time ? (is_string($order->payment_time) ? $order->payment_time : $order->payment_time->toISOString()) : null
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('ApiOrderController@checkPayment: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi kiểm tra trạng thái thanh toán',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

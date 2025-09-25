@@ -141,6 +141,14 @@ class ProductController extends Controller
     }
 
     /**
+     * Hiển thị chi tiết sản phẩm sử dụng API
+     */
+    public function showApi($id)
+    {
+        return view('fontend.product.trangchitiet-api', compact('id'));
+    }
+
+    /**
      * Lấy sản phẩm liên quan
      */
     private function getRelatedProducts($categoryId, $excludeId)

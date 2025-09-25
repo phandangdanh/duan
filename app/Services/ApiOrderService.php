@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderConfirmationEmail;
 
 class ApiOrderService
 {
@@ -176,6 +178,18 @@ class ApiOrderService
             
             Log::info('Order created successfully', ['order_id' => $order->id, 'total_amount' => $finalAmount]);
             
+            // Gửi email xác nhận đơn hàng
+            try {
+                $this->sendOrderConfirmationEmail($order, $orderDetails);
+                Log::info('Order confirmation email sent successfully', ['order_id' => $order->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send order confirmation email', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Không throw exception để không làm fail việc tạo đơn hàng
+            }
+            
             return $order;
         });
     }
@@ -308,5 +322,26 @@ class ApiOrderService
     {
         $filters['user_id'] = $userId;
         return $this->getOrders($filters, $perPage);
+    }
+
+    /**
+     * Gửi email xác nhận đơn hàng
+     */
+    private function sendOrderConfirmationEmail(DonHang $order, array $orderDetails)
+    {
+        // Kiểm tra email có tồn tại không
+        if (empty($order->email)) {
+            Log::warning('Order has no email address', ['order_id' => $order->id]);
+            return;
+        }
+
+        // Gửi email
+        Mail::to($order->email)->send(new OrderConfirmationEmail($order, $orderDetails));
+        
+        Log::info('Order confirmation email queued', [
+            'order_id' => $order->id,
+            'email' => $order->email,
+            'customer_name' => $order->hoten
+        ]);
     }
 }

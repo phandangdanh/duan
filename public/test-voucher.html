@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Voucher System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .result.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .result.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Voucher System</h1>
+    
+    <div class="test-section">
+        <h3>Test Voucher Check</h3>
+        <input type="text" id="voucherCode" placeholder="Nhập mã voucher" value="TEST10">
+        <input type="number" id="totalAmount" placeholder="Tổng tiền" value="1000000">
+        <button class="test-button" onclick="testVoucherCheck()">Test Voucher Check</button>
+        <div id="voucher-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Voucher API Direct</h3>
+        <button class="test-button" onclick="testVoucherAPI()">Test Voucher API</button>
+        <div id="api-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test CheckoutManager</h3>
+        <button class="test-button" onclick="testCheckoutManager()">Test CheckoutManager</button>
+        <div id="checkout-result" class="result"></div>
+    </div>
+
+    <script>
+        // Test voucher check
+        async function testVoucherCheck() {
+            const voucherCode = document.getElementById('voucherCode').value;
+            const totalAmount = parseInt(document.getElementById('totalAmount').value);
+            
+            if (!voucherCode) {
+                document.getElementById('voucher-result').innerHTML = `
+                    <div class="result error">
+                        ❌ Vui lòng nhập mã voucher!
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                const response = await fetch('/checkout/check-voucher', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 'test-token'
+                    },
+                    body: JSON.stringify({
+                        voucher_code: voucherCode,
+                        total_amount: totalAmount
+                    })
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('voucher-result').innerHTML = `
+                    <div class="result ${data.success ? 'success' : 'error'}">
+                        ${data.success ? '✅' : '❌'} Voucher Check Result:<br>
+                        - Success: ${data.success}<br>
+                        - Message: ${data.message}<br>
+                        - Voucher: ${JSON.stringify(data.voucher, null, 2)}<br>
+                        - Discount: ${data.discount || 'N/A'}<br>
+                        - Final Total: ${data.final_total || 'N/A'}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('voucher-result').innerHTML = `
+                    <div class="result error">
+                        ❌ Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test voucher API
+        async function testVoucherAPI() {
+            try {
+                const response = await fetch('/api/vouchers/', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('api-result').innerHTML = `
+                    <div class="result success">
+                        ✅ Voucher API Response:<br>
+                        - Status: ${response.status}<br>
+                        - Data: ${JSON.stringify(data, null, 2)}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('api-result').innerHTML = `
+                    <div class="result error">
+                        ❌ API Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test CheckoutManager
+        function testCheckoutManager() {
+            const result = `
+                <div class="result ${window.checkoutManager ? 'success' : 'error'}">
+                    ${window.checkoutManager ? '✅' : '❌'} CheckoutManager Status:<br>
+                    - Available: ${window.checkoutManager ? 'Yes' : 'No'}<br>
+                    - Total Amount: ${window.checkoutManager ? window.checkoutManager.totalAmount : 'N/A'}<br>
+                    - Cart Items: ${window.checkoutManager ? window.checkoutManager.cartItems.length : 'N/A'}<br>
+                    - checkVoucher Function: ${typeof window.checkVoucher}
+                </div>
+            `;
+            
+            document.getElementById('checkout-result').innerHTML = result;
+        }
+
+        // Auto-test on load
+        window.onload = function() {
+            testCheckoutManager();
+        };
+    </script>
+</body>
+</html>

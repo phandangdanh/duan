@@ -486,6 +486,16 @@
                             @endif
                         </td>
                     </tr>
+                    <tr>
+                        <td>Số lượng (sản phẩm chính)</td>
+                        <td>
+                            @if($sanpham->soLuong && $sanpham->soLuong > 0)
+                                <span class="badge bg-success">{{ number_format($sanpham->soLuong) }}</span>
+                            @else
+                                <span class="badge bg-danger">Hết hàng</span>
+                            @endif
+                        </td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -503,7 +513,6 @@
                                     <th>Số lượng</th>
                                     <th>Giá bán</th>
                                     <th>Giá khuyến mãi</th>
-                                    <th>Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -523,7 +532,7 @@
                                                     background-color: {{ $chitiet->mausac->mota }};
                                                     border: 2px solid #ddd;
                                                 "></span>
-                                                <span>{{ $chitiet->mausac->mota }}</span>
+                                                <span>{{ $chitiet->mausac->ten }}</span>
                                             </div>
                                         @else
                                             <span class="text-muted">Chưa có màu sắc</span>
@@ -531,26 +540,32 @@
                                     </td>
                                     <td>
                                         @if($chitiet->size)
-                                            <span class="badge bg-info">{{ $chitiet->size->mota }}</span>
+                                            <span class="badge bg-info">{{ $chitiet->size->ten }}</span>
                                         @else
                                             <span class="text-muted">Chưa có size</span>
                                         @endif
                                     </td>
                                     <td>
                                         @php
-                                            // Tổng tồn kho = Số lượng sản phẩm chính + Số lượng variant hiện tại
+                                            // Kiểm tra xem sản phẩm có biến thể khác hay không
+                                            $hasOtherVariants = $sanpham->chitietsanpham->where('id', '!=', $chitiet->id)->count() > 0;
+                                            
+                                            if ($hasOtherVariants) {
+                                                // Có biến thể khác -> chỉ hiển thị số lượng variant hiện tại
+                                                $variantStock = $chitiet->soLuong ?? 0;
+                                                $displayStock = $variantStock;
+                                                $stockType = 'Variant';
+                                            } else {
+                                                // Không có biến thể khác -> hiển thị số lượng sản phẩm chính
                                             $mainStock = $sanpham->soLuong ?? 0;
-                                            $variantStock = $chitiet->soluong ?? 0;
-                                            $totalStock = $mainStock + $variantStock;
+                                                $displayStock = $mainStock;
+                                                $stockType = 'Chính';
+                                            }
                                         @endphp
-                                        @if($totalStock > 0)
-                                            <span class="badge bg-success">{{ number_format($totalStock) }}</span>
-                                            @if($mainStock > 0)
-                                                <br><small class="text-muted">Chính: {{ $mainStock }}</small>
-                                            @endif
-                                            @if($variantStock > 0)
-                                                <br><small class="text-muted">Variant: {{ $variantStock }}</small>
-                                            @endif
+                                        
+                                        @if($displayStock > 0)
+                                            <span class="badge bg-success">{{ number_format($displayStock) }}</span>
+                                            <br><small class="text-muted">{{ $stockType }}: {{ $displayStock }}</small>
                                         @else
                                             <span class="badge bg-danger">Hết hàng</span>
                                         @endif
@@ -576,19 +591,6 @@
                                             </span>
                                         @else
                                             <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @php
-                                            // Tổng tồn kho = Số lượng sản phẩm chính + Số lượng variant hiện tại
-                                            $mainStock = $sanpham->soLuong ?? 0;
-                                            $variantStock = $chitiet->soluong ?? 0;
-                                            $totalStock = $mainStock + $variantStock;
-                                        @endphp
-                                        @if($totalStock > 0)
-                                            <span class="badge bg-success">Còn hàng</span>
-                                        @else
-                                            <span class="badge bg-danger">Hết hàng</span>
                                         @endif
                                     </td>
                                 </tr>

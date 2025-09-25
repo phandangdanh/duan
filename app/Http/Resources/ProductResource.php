@@ -19,6 +19,7 @@ class ProductResource extends JsonResource
             'id_danhmuc' => $this->id_danhmuc,
             'moTa' => $this->moTa,
             'trangthai' => (bool) $this->trangthai,
+            'soLuong' => (int) $this->soLuong,
             'base_price' => $this->base_price ? (float) $this->base_price : null,
             'base_sale_price' => $this->base_sale_price ? (float) $this->base_sale_price : null,
             'danhmuc' => $this->whenLoaded('danhmuc', function () {
@@ -46,11 +47,11 @@ class ProductResource extends JsonResource
                         'soLuong' => (int) $detail->soLuong,
                         'gia' => $detail->gia ? (float) $detail->gia : null,
                         'gia_khuyenmai' => $detail->gia_khuyenmai ? (float) $detail->gia_khuyenmai : null,
-                        'mausac' => $detail->relationLoaded('mausac') ? [
+                        'mausac' => $detail->relationLoaded('mausac') && $detail->mausac ? [
                             'id' => $detail->mausac->id,
                             'ten' => $detail->mausac->ten,
                         ] : null,
-                        'size' => $detail->relationLoaded('size') ? [
+                        'size' => $detail->relationLoaded('size') && $detail->size ? [
                             'id' => $detail->size->id,
                             'ten' => $detail->size->ten,
                         ] : null,

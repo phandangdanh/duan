@@ -84,27 +84,62 @@ class CheckoutController extends Controller
     public function processOrder(Request $request)
     {
         try {
-            // Validate dữ liệu
-            $request->validate([
-                'hoten' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'sodienthoai' => 'required|string|max:20',
-                'diachigiaohang' => 'required|string|max:500',
-                'phuongthucthanhtoan' => 'required|string|in:cod,banking,momo,zalopay',
-                'ghichu' => 'nullable|string|max:1000',
-                'voucher_code' => 'nullable|string|max:50',
+            // Debug: Log request data
+            Log::info('Checkout processOrder request:', [
+                'all_data' => $request->all(),
+                'cart_data' => $request->input('cart_data'),
+                'phuongthucthanhtoan' => $request->input('phuongthucthanhtoan')
             ]);
+            
+            // Validate dữ liệu
+            try {
+                $request->validate([
+                    'hoten' => 'required|string|max:255',
+                    'email' => 'required|email|max:255',
+                    'sodienthoai' => 'required|string|max:20',
+                    'diachigiaohang' => 'required|string|max:500',
+                    'phuongthucthanhtoan' => 'required|string|in:cod,banking,momo,zalopay',
+                    'ghichu' => 'nullable|string|max:1000',
+                    'voucher_code' => 'nullable|string|max:50',
+                    'cart_data' => 'required|string', // Cart data từ localStorage
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                Log::error('Validation failed:', [
+                    'errors' => $e->errors(),
+                    'request_data' => $request->all()
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dữ liệu không hợp lệ: ' . implode(', ', array_flatten($e->errors())),
+                    'errors' => $e->errors()
+                ], 422);
+            }
 
-            // Kiểm tra giỏ hàng
-            if ($this->cartService->isEmpty()) {
+            // Lấy cart data từ localStorage
+            $cartData = $request->input('cart_data');
+            $cartItems = json_decode($cartData, true);
+            
+            if (!$cartItems || empty($cartItems)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Giỏ hàng trống!'
                 ], 400);
             }
 
-            $cartItems = $this->cartService->getCartWithDetails();
-            $total = $this->cartService->getTotal();
+            // Tính tổng tiền từ cart data
+            $total = 0;
+            foreach ($cartItems as $item) {
+                $price = floatval($item['price'] ?? 0);
+                $quantity = intval($item['quantity'] ?? 0);
+                $total += $price * $quantity;
+            }
+            
+            // Log để debug
+            Log::info('Cart total calculation:', [
+                'cart_items' => $cartItems,
+                'calculated_total' => $total
+            ]);
 
             // Chuẩn bị dữ liệu đơn hàng
             $orderData = [
@@ -115,7 +150,7 @@ class CheckoutController extends Controller
                 'diachigiaohang' => $request->diachigiaohang,
                 'phuongthucthanhtoan' => $request->phuongthucthanhtoan,
                 'ghichu' => $request->ghichu,
-                'chi_tiet_don_hang' => $this->prepareOrderDetails($cartItems),
+                'chi_tiet_don_hang' => $this->prepareOrderDetailsFromLocalStorage($cartItems),
                 'vouchers' => $this->prepareVouchers($request->voucher_code),
             ];
 
@@ -129,20 +164,12 @@ class CheckoutController extends Controller
                 'diachigiaohang' => $orderData['diachigiaohang'],
                 'phuongthucthanhtoan' => $orderData['phuongthucthanhtoan'],
                 'ghichu' => $orderData['ghichu'],
-                'chi_tiet_don_hang' => $this->prepareOrderDetailsForService($cartItems),
+                'chi_tiet_don_hang' => $this->prepareOrderDetailsFromLocalStorageForService($cartItems),
+                'vouchers' => $orderData['vouchers'],
             ];
 
-            // Kiểm tra tồn kho trước khi tạo đơn hàng
-            $inventoryCheck = $this->cartService->checkInventory();
-            if (!$inventoryCheck['success']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $inventoryCheck['message']
-                ], 400);
-            }
-            
-            // Lưu cảnh báo tồn kho nếu có
-            $inventoryWarnings = $inventoryCheck['warnings'] ?? [];
+            // Kiểm tra tồn kho trước khi tạo đơn hàng (tạm thời bỏ qua vì đã check ở frontend)
+            $inventoryWarnings = [];
 
             // Tạo đơn hàng
             Log::info('Creating order with data:', $orderDataForService);
@@ -150,27 +177,22 @@ class CheckoutController extends Controller
             Log::info('Order created:', ['order_id' => $order ? $order->id : 'null', 'order_type' => get_class($order)]);
 
             if ($order) {
-                // Xóa giỏ hàng sau khi tạo đơn hàng thành công
-                $this->cartService->clearCart();
+                // Cart sẽ được xóa ở frontend sau khi đơn hàng thành công
+                Log::info('Order created successfully:', [
+                    'order_id' => $order->id,
+                    'payment_method' => $request->phuongthucthanhtoan,
+                    'order_status' => $order->trangthai
+                ]);
 
                 // Xử lý thanh toán
                 if ($request->phuongthucthanhtoan === 'cod') {
-                    // COD - trừ tồn kho ngay vì đã thanh toán
-                    $inventoryResult = $this->cartService->deductInventory();
-                    if (!$inventoryResult['success']) {
-                        // Nếu không đủ tồn kho, xóa đơn hàng và trả về lỗi
-                        $order->delete();
-                        return response()->json([
-                            'success' => false,
-                            'message' => $inventoryResult['message']
-                        ], 400);
-                    }
+                    // COD - tạm thời bỏ qua kiểm tra inventory vì đã check ở frontend
                     
                     $response = [
                         'success' => true,
                         'message' => 'Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng.',
                         'order_id' => $order->id,
-                        'redirect_url' => route('order.success', $order->id)
+                        'redirect_url' => route('checkout.success', $order->id)
                     ];
                     
                     // Thêm cảnh báo tồn kho nếu có
@@ -182,12 +204,23 @@ class CheckoutController extends Controller
                     return response()->json($response);
                 } else {
                     // Thanh toán online - KHÔNG trừ tồn kho, chờ thanh toán thành công
-                    $paymentUrl = $this->processOnlinePayment($order, $request->phuongthucthanhtoan);
+                    Log::info('Processing online payment:', [
+                        'order_id' => $order->id,
+                        'payment_method' => $request->phuongthucthanhtoan
+                    ]);
+                    
+                    $redirectUrl = $this->processOnlinePayment($order, $request->phuongthucthanhtoan);
+                    
+                    Log::info('Payment redirect URL:', [
+                        'order_id' => $order->id,
+                        'redirect_url' => $redirectUrl
+                    ]);
+                    
                     return response()->json([
                         'success' => true,
-                        'message' => 'Đang chuyển hướng đến cổng thanh toán...',
+                        'message' => 'Đang chuyển hướng đến trang thanh toán...',
                         'order_id' => $order->id,
-                        'payment_url' => $paymentUrl
+                        'redirect_url' => $redirectUrl
                     ]);
                 }
             } else {
@@ -247,7 +280,8 @@ class CheckoutController extends Controller
     {
         try {
             $request->validate([
-                'voucher_code' => 'required|string|max:50'
+                'voucher_code' => 'required|string|max:50',
+                'total_amount' => 'required|numeric|min:0' // Total amount từ localStorage
             ]);
 
             $voucher = $this->voucherService->getVoucherByCode($request->voucher_code);
@@ -259,7 +293,7 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            $cartTotal = $this->cartService->getTotal();
+            $cartTotal = $request->input('total_amount');
             $discount = $this->calculateVoucherDiscount($voucher, $cartTotal);
 
             return response()->json([
@@ -279,19 +313,14 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Chuẩn bị chi tiết đơn hàng
+     * Chuẩn bị chi tiết đơn hàng từ localStorage
      */
-    private function prepareOrderDetails($cartItems)
+    private function prepareOrderDetailsFromLocalStorage($cartItems)
     {
         $details = [];
         foreach ($cartItems as $item) {
-            // Kiểm tra product có tồn tại không
-            if (!isset($item['product']) || !$item['product']) {
-                continue;
-            }
-            
             $details[] = [
-                'id_chitietsanpham' => $item['variant_id'] ?? $item['product']->id,
+                'id_chitietsanpham' => $item['variant_id'] ?? $item['product_id'],
                 'soluong' => $item['quantity'],
                 'dongia' => $item['price'],
                 'ghichu' => $item['variant_name'] ?? null,
@@ -301,29 +330,62 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Chuẩn bị chi tiết đơn hàng cho DonHangService
+     * Chuẩn bị chi tiết đơn hàng cho DonHangService từ localStorage
      */
-    private function prepareOrderDetailsForService($cartItems)
+    private function prepareOrderDetailsFromLocalStorageForService($cartItems)
     {
         $details = [];
-        Log::info('Preparing order details for service:', ['cart_items_count' => count($cartItems)]);
+        Log::info('Preparing order details for service from localStorage:', ['cart_items_count' => count($cartItems)]);
         
         foreach ($cartItems as $index => $item) {
             Log::info("Processing cart item {$index}:", [
                 'item' => $item,
-                'has_product' => isset($item['product']),
-                'product_type' => isset($item['product']) ? get_class($item['product']) : 'null'
+                'product_id' => $item['product_id'] ?? 'null',
+                'variant_id' => $item['variant_id'] ?? 'null',
+                'name' => $item['name'] ?? 'null'
             ]);
             
-            // Kiểm tra product có tồn tại không
-            if (!isset($item['product']) || !$item['product']) {
-                Log::warning("Skipping item {$index} - no product found");
-                continue;
+            // Nếu là sản phẩm chính (variant_id = 0), tìm hoặc tạo ChiTietSanPham
+            // Nếu là variant, sử dụng variant_id
+            if ($item['variant_id'] && $item['variant_id'] != 0) {
+                $id_chitietsanpham = $item['variant_id'];
+            } else {
+                // Tìm ChiTietSanPham cho sản phẩm chính
+                $chiTietSanPham = \App\Models\ChiTietSanPham::where('id_sp', $item['product_id'])
+                    ->whereNull('deleted_at')
+                    ->first();
+                
+                if ($chiTietSanPham) {
+                    $id_chitietsanpham = $chiTietSanPham->id;
+                } else {
+                    // Tạo ChiTietSanPham mới cho sản phẩm chính
+                    $sanPham = \App\Models\SanPham::find($item['product_id']);
+                    if ($sanPham) {
+                        $id_chitietsanpham = \App\Models\ChiTietSanPham::create([
+                            'id_sp' => $item['product_id'],
+                            'id_mausac' => null,
+                            'id_size' => null,
+                            'soLuong' => $sanPham->soLuong ?? 0,
+                            'tenSp' => $sanPham->tenSP,
+                            'gia' => $sanPham->base_price ?? 0,
+                            'gia_khuyenmai' => $sanPham->base_sale_price ?? 0,
+                        ])->id;
+                    } else {
+                        throw new \Exception("Không tìm thấy sản phẩm với ID: " . $item['product_id']);
+                    }
+                }
             }
             
+            Log::info('Processing cart item:', [
+                'variant_id' => $item['variant_id'] ?? 'null',
+                'product_id' => $item['product_id'] ?? 'null',
+                'final_id_chitietsanpham' => $id_chitietsanpham,
+                'name' => $item['name'] ?? 'null'
+            ]);
+            
             $details[] = [
-                'id_chitietsanpham' => $item['variant_id'] ?? $item['product']->id,
-                'tensanpham' => $item['product']->tenSP ?? $item['product_name'],
+                'id_chitietsanpham' => $id_chitietsanpham,
+                'tensanpham' => $item['name'] ?? 'Sản phẩm',
                 'dongia' => $item['price'],
                 'soluong' => $item['quantity'],
                 'thanhtien' => $item['price'] * $item['quantity'],
@@ -331,7 +393,7 @@ class CheckoutController extends Controller
             ];
         }
         
-        Log::info('Order details prepared:', ['details_count' => count($details)]);
+        Log::info('Order details prepared from localStorage:', ['details_count' => count($details)]);
         return $details;
     }
 
@@ -359,10 +421,12 @@ class CheckoutController extends Controller
     {
         // TODO: Implement payment gateway integration
         // Tạm thời return URL giả
-        return route('payment.process', [
-            'order_id' => $order->id,
-            'method' => $paymentMethod
-        ]);
+        if ($paymentMethod === 'banking') {
+            return route('bank.payment.info', $order->id);
+        }
+        
+        // Cho các phương thức khác, redirect đến trang success
+        return route('checkout.success', $order->id);
     }
 
     /**

@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    // Khởi tạo endpoints nếu chưa có
+    initEndpoints();
+    
     // Khởi tạo các sự kiện
     initSelectAll();
     initUpdateTrangThai();
@@ -6,6 +9,20 @@ $(document).ready(function() {
     initBulkActions();
     initRefresh();
     initExport();
+    
+    // Khởi tạo endpoints
+    function initEndpoints() {
+        if (!window.DONHANG_ENDPOINTS) {
+            console.warn('DONHANG_ENDPOINTS not defined, using fallback URLs');
+            window.DONHANG_ENDPOINTS = {
+                updateTrangThai: '/ajax/donhang/update-trangthai',
+                updateTrangThaiBulk: '/ajax/donhang/update-trangthai-bulk',
+                destroy: '/ajax/donhang/destroy',
+                getInfo: '/ajax/donhang/get-info',
+                getStats: '/ajax/donhang/get-stats'
+            };
+        }
+    }
     
     // Khởi tạo select all
     function initSelectAll() {
@@ -247,6 +264,11 @@ $(document).ready(function() {
     
     // AJAX: Cập nhật trạng thái
     function updateTrangThai(formData) {
+        if (!window.DONHANG_ENDPOINTS || !window.DONHANG_ENDPOINTS.updateTrangThai) {
+            console.error('DONHANG_ENDPOINTS.updateTrangThai is not defined');
+            return;
+        }
+        
         $.ajax({
             url: window.DONHANG_ENDPOINTS.updateTrangThai,
             method: 'POST',
@@ -294,6 +316,15 @@ $(document).ready(function() {
     
     // AJAX: Xóa đơn hàng
     function deleteDonHang(donhangId) {
+        if (!window.DONHANG_ENDPOINTS || !window.DONHANG_ENDPOINTS.destroy) {
+            console.error('DONHANG_ENDPOINTS.destroy is not defined');
+            return;
+        }
+        
+        console.log('Attempting to delete order:', donhangId);
+        console.log('CSRF Token:', $('meta[name="csrf-token"]').attr('content'));
+        console.log('Endpoint:', window.DONHANG_ENDPOINTS.destroy);
+        
         $.ajax({
             url: window.DONHANG_ENDPOINTS.destroy,
             method: 'POST',
@@ -335,6 +366,11 @@ $(document).ready(function() {
     
     // AJAX: Cập nhật trạng thái hàng loạt
     function bulkUpdateTrangThai(formData) {
+        if (!window.DONHANG_ENDPOINTS || !window.DONHANG_ENDPOINTS.updateTrangThaiBulk) {
+            console.error('DONHANG_ENDPOINTS.updateTrangThaiBulk is not defined');
+            return;
+        }
+        
         $.ajax({
             url: window.DONHANG_ENDPOINTS.updateTrangThaiBulk,
             method: 'POST',
@@ -382,15 +418,17 @@ $(document).ready(function() {
     
     // AJAX: Xóa hàng loạt
     function bulkDelete(selectedIds) {
+        if (!window.DONHANG_ENDPOINTS || !window.DONHANG_ENDPOINTS.destroy) {
+            console.error('DONHANG_ENDPOINTS.destroy is not defined');
+            return;
+        }
+        
         $.ajax({
             url: window.DONHANG_ENDPOINTS.destroy,
             method: 'POST',
             data: { ids: selectedIds },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#confirmBulkDelete').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xóa...');
             },
             success: function(response) {
                 if (response.success) {
@@ -420,9 +458,6 @@ $(document).ready(function() {
                     text: message,
                     icon: 'error'
                 });
-            },
-            complete: function() {
-                $('#confirmBulkDelete').prop('disabled', false).html('Xóa');
             }
         });
     }
@@ -434,6 +469,12 @@ $(document).ready(function() {
     
     // Làm mới thống kê
     function refreshStats() {
+        // Kiểm tra xem endpoints có tồn tại không
+        if (!window.DONHANG_ENDPOINTS || !window.DONHANG_ENDPOINTS.getStats) {
+            console.error('DONHANG_ENDPOINTS.getStats is not defined');
+            return;
+        }
+        
         $.ajax({
             url: window.DONHANG_ENDPOINTS.getStats,
             method: 'GET',
@@ -442,6 +483,9 @@ $(document).ready(function() {
                     // Cập nhật các số liệu thống kê
                     updateStatsDisplay(response.data);
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error refreshing stats:', error);
             }
         });
     }

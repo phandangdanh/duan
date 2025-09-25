@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Response Debug</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">API Response Debug</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>API Response Analysis</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-3" onclick="debugAPI()">Debug API Response</button>
+                        <div id="debug-result" class="mt-3">
+                            <p class="text-muted">Click button to debug API response...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function debugAPI() {
+            const resultDiv = document.getElementById('debug-result');
+            resultDiv.innerHTML = '<p class="text-info">Debugging API response...</p>';
+            
+            try {
+                console.log('=== DEBUGGING API RESPONSE ===');
+                
+                const response = await fetch('http://localhost:8000/api/products/106', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                const data = await response.json();
+                console.log('Raw API response:', data);
+                
+                // Analyze response structure
+                const analysis = analyzeResponse(data);
+                
+                resultDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>🔍 API Response Analysis</h6>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Response Type:</strong> ${typeof data}</p>
+                        <p><strong>Has 'success' field:</strong> ${data.hasOwnProperty('success') ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Has 'data' field:</strong> ${data.hasOwnProperty('data') ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Has 'id' field:</strong> ${data.hasOwnProperty('id') ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Has 'tenSP' field:</strong> ${data.hasOwnProperty('tenSP') ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Has 'gia' field:</strong> ${data.hasOwnProperty('gia') ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Has 'soLuong' field:</strong> ${data.hasOwnProperty('soLuong') ? '✅ Yes' : '❌ No'}</p>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6>📋 Response Structure</h6>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <h6>✅ Recommended Fix</h6>
+                        <p>${analysis.recommendation}</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Debug Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Debug Error!</h6>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function analyzeResponse(data) {
+            let recommendation = '';
+            
+            if (data && data.success && data.data) {
+                recommendation = 'Response has correct format: {success: true, data: {...}}. JavaScript should work correctly.';
+            } else if (data && data.id) {
+                recommendation = 'Response is direct product data. Update JavaScript to handle: if (response.id) { this.product = response; }';
+            } else if (data && Array.isArray(data)) {
+                recommendation = 'Response is an array. Update JavaScript to handle: if (Array.isArray(response)) { this.product = response[0]; }';
+            } else {
+                recommendation = 'Unknown response format. Check API controller and update JavaScript accordingly.';
+            }
+            
+            return { recommendation };
+        }
+        
+        // Auto-debug on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Debug page loaded, ready to analyze API response');
+        });
+    </script>
+</body>
+</html>

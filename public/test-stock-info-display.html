@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Stock Info Display</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Stock Info Display</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>New Stock Info Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-3" onclick="testStockInfo()">Test Stock Info</button>
+                        
+                        <div id="test-result" class="mt-3">
+                            <p class="text-muted">Click button to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>New Stock Info Logic</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6>✅ New Stock Display:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Số lượng có sẵn:</strong> Tổng (chính + biến thể)</li>
+                                <li><strong>Sản phẩm chính:</strong> Số lượng sản phẩm chính</li>
+                                <li><strong>Biến thể:</strong> "X sản phẩm (Y màu, Z size)"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Example Display</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>📊 Example:</h6>
+                            <p><strong>Số lượng có sẵn:</strong> 25</p>
+                            <p><strong>• Sản phẩm chính:</strong> 10 sản phẩm</p>
+                            <p><strong>• Biến thể:</strong> 15 sản phẩm (3 màu, 4 size)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-info mb-3">
+                            <i class="fas fa-external-link-alt"></i> Open Product Detail Page
+                        </a>
+                        
+                        <div class="alert alert-info">
+                            <h6>📋 Expected Stock Display:</h6>
+                            <ul class="mb-0">
+                                <li>✅ "Số lượng có sẵn: X" (main + variants total)</li>
+                                <li>✅ "• Sản phẩm chính hiện có: Y sản phẩm"</li>
+                                <li>✅ "• Biến thể hiện có: Z sản phẩm (A màu, B size)"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testStockInfo() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<p class="text-info">Testing stock info...</p>';
+            
+            try {
+                console.log('=== TESTING STOCK INFO ===');
+                
+                const response = await fetch('http://localhost:8000/api/products/106', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const product = data.data;
+                const variants = product.chitietsanpham || [];
+                
+                // Calculate stock info
+                const mainStock = product.soLuong || 0;
+                const totalVariantStock = variants.reduce((sum, v) => sum + (v.soLuong || 0), 0);
+                const totalAvailableStock = mainStock + totalVariantStock;
+                
+                // Get unique colors and sizes
+                const uniqueColors = [...new Set(variants.map(v => v.id_mausac))].length;
+                const uniqueSizes = [...new Set(variants.map(v => v.id_size))].length;
+                
+                // Get color and size names
+                const colorNames = [...new Set(variants.map(v => v.mausac.ten))];
+                const sizeNames = [...new Set(variants.map(v => v.size.ten))];
+                
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>✅ Stock Calculation Results</h6>
+                        <p><strong>Product:</strong> ${product.tenSP}</p>
+                        <p><strong>Main Stock:</strong> ${mainStock}</p>
+                        <p><strong>Total Variant Stock:</strong> ${totalVariantStock}</p>
+                        <p><strong>Total Available:</strong> ${totalAvailableStock}</p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6>🎨 Variant Details:</h6>
+                        <p><strong>Unique Colors:</strong> ${uniqueColors}</p>
+                        <p><strong>Color Names:</strong> ${colorNames.join(', ')}</p>
+                        <p><strong>Unique Sizes:</strong> ${uniqueSizes}</p>
+                        <p><strong>Size Names:</strong> ${sizeNames.join(', ')}</p>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <h6>📊 Expected Display:</h6>
+                        <div class="bg-light p-3 rounded">
+                            <p><strong>Số lượng có sẵn:</strong> ${totalAvailableStock}</p>
+                            <p><strong>• Sản phẩm chính hiện có:</strong> ${mainStock} sản phẩm</p>
+                            <p><strong>• Biến thể hiện có:</strong> ${totalVariantStock} sản phẩm (${uniqueColors} màu, ${uniqueSizes} size)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6>⚠️ Test Checklist:</h6>
+                        <ul class="mb-0">
+                            <li>✅ Total stock = main + variants</li>
+                            <li>✅ Main stock shows correct number</li>
+                            <li>✅ Variant info shows total + color/size count</li>
+                            <li>✅ Stock info updates when selecting variants</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Test Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Test Error!</h6>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Stock info test page loaded');
+        });
+    </script>
+</body>
+</html>

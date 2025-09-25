@@ -18,7 +18,13 @@ class CartService
      */
     public function getCart()
     {
-        return Session::get(self::CART_SESSION_KEY, []);
+        $cart = Session::get(self::CART_SESSION_KEY, []);
+        Log::info('CartService getCart called:', [
+            'cart' => $cart,
+            'cart_count' => count($cart),
+            'session_id' => session()->getId()
+        ]);
+        return $cart;
     }
 
     /**
@@ -89,14 +95,29 @@ class CartService
      */
     public function addToCart($productId, $variantId = null, $quantity = 1)
     {
+        Log::info('=== CartService addToCart called ===', [
+            'product_id' => $productId,
+            'variant_id' => $variantId,
+            'quantity' => $quantity
+        ]);
+        
         $cart = $this->getCart();
         $key = $this->generateCartKey($productId, $variantId);
+        
+        Log::info('Generated cart key:', ['key' => $key]);
 
         // Lấy thông tin sản phẩm
         $product = SanPham::with(['hinhanh', 'chitietsanpham'])->find($productId);
         if (!$product) {
+            Log::error('Product not found', ['product_id' => $productId]);
             return ['success' => false, 'message' => 'Sản phẩm không tồn tại'];
         }
+        
+        Log::info('Product found:', [
+            'product_id' => $product->id,
+            'product_name' => $product->tenSP,
+            'main_stock' => $product->soLuong
+        ]);
 
         // Lấy thông tin variant nếu có
         $variant = null;
@@ -104,8 +125,15 @@ class CartService
         $variantName = '';
 
         if ($variantId) {
+            Log::info('Processing variant:', ['variant_id' => $variantId]);
             $variant = ChiTietSanPham::find($variantId);
             if (!$variant || $variant->id_sp != $productId) {
+                Log::error('Invalid variant', [
+                    'variant_id' => $variantId,
+                    'variant_found' => !!$variant,
+                    'variant_product_id' => $variant ? $variant->id_sp : null,
+                    'expected_product_id' => $productId
+                ]);
                 return ['success' => false, 'message' => 'Biến thể sản phẩm không hợp lệ'];
             }
             
@@ -123,18 +151,33 @@ class CartService
             }
             
             $variantName = $variant->tenSp;
+            Log::info('Variant processed:', [
+                'variant_name' => $variantName,
+                'price' => $price,
+                'variant_stock' => $variant->soLuong
+            ]);
         } else {
             // Không có variant, dùng giá sản phẩm chính
+            Log::info('Processing main product (no variant)');
             $price = $product->gia;
+            Log::info('Main product processed:', [
+                'price' => $price,
+                'main_stock' => $product->soLuong
+            ]);
         }
 
         // Bỏ kiểm tra stock - cho phép thêm vào giỏ hàng
 
         // Thêm hoặc cập nhật sản phẩm trong giỏ hàng
         if (isset($cart[$key])) {
+            Log::info('Updating existing cart item:', [
+                'key' => $key,
+                'old_quantity' => $cart[$key]['quantity'],
+                'new_quantity' => $cart[$key]['quantity'] + $quantity
+            ]);
             $cart[$key]['quantity'] += $quantity;
         } else {
-            $cart[$key] = [
+            $cartItem = [
                 'product_id' => $productId,
                 'variant_id' => $variantId,
                 'product_name' => $product->tenSP,
@@ -144,11 +187,23 @@ class CartService
                 'image' => $product->hinhanh->first()->url ?? 'default.jpg',
                 'max_stock' => $variant ? $variant->soLuong : 999,
             ];
+            
+            Log::info('Adding new cart item:', [
+                'key' => $key,
+                'cart_item' => $cartItem
+            ]);
+            
+            $cart[$key] = $cartItem;
         }
 
         // Không cần trừ số lượng hiển thị vì getDisplayStock đã tính từ giỏ hàng
 
         // Cập nhật session
+        Log::info('Saving cart to session:', [
+            'cart_keys' => array_keys($cart),
+            'total_items' => count($cart)
+        ]);
+        
         Session::put(self::CART_SESSION_KEY, $cart);
         $this->updateCartCount();
         
@@ -377,31 +432,155 @@ class CartService
             $mainStock = $product->soLuong ?? 0;
             $totalRealStock = $mainStock + $variantStock;
             
-            // Debug: Log stock calculation
+            Log::info('Variant stock calculation:', [
+                'variant_id' => $variantId,
+                'variant_stock' => $variantStock,
+                'main_stock' => $mainStock,
+                'total_real_stock' => $totalRealStock
+            ]);
         } else {
             // Nếu không có variant, tính tổng stock (sản phẩm chính + tất cả variant)
             $mainStock = $product->soLuong ?? 0;
             $variantStock = $product->chitietsanpham->sum('soLuong');
             $totalRealStock = $mainStock + $variantStock;
             
-            // Debug: Log stock calculation
+            Log::info('Main product stock calculation:', [
+                'main_stock' => $mainStock,
+                'variant_stock' => $variantStock,
+                'total_real_stock' => $totalRealStock
+            ]);
         }
 
         // Trừ đi số lượng đã thêm vào giỏ hàng cho sản phẩm này
         $cart = $this->getCart();
         $cartQuantity = 0;
         
+        Log::info('Calculating cart quantity:', [
+            'product_id' => $productId,
+            'variant_id' => $variantId,
+            'cart_items' => $cart
+        ]);
+        
         foreach ($cart as $item) {
             if ($item['product_id'] == $productId) {
-                $cartQuantity += $item['quantity'];
+                // Nếu không có variant, chỉ tính sản phẩm chính
+                if (!$variantId && !$item['variant_id']) {
+                    $cartQuantity += $item['quantity'];
+                    Log::info('Added main product quantity:', [
+                        'item' => $item,
+                        'cart_quantity' => $cartQuantity
+                    ]);
+                }
+                // Nếu có variant, chỉ tính variant cụ thể
+                elseif ($variantId && $item['variant_id'] == $variantId) {
+                    $cartQuantity += $item['quantity'];
+                    Log::info('Added variant quantity:', [
+                        'item' => $item,
+                        'cart_quantity' => $cartQuantity
+                    ]);
+                }
             }
         }
 
         $displayStock = max(0, $totalRealStock - $cartQuantity);
         
-        // Debug: Log final result
+        Log::info('Final stock calculation:', [
+            'product_id' => $productId,
+            'variant_id' => $variantId,
+            'total_real_stock' => $totalRealStock,
+            'cart_quantity' => $cartQuantity,
+            'display_stock' => $displayStock
+        ]);
 
         return $displayStock;
+    }
+
+    /**
+     * Lấy thông tin stock chi tiết cho trang sản phẩm
+     */
+    public function getDetailedStockInfo($productId)
+    {
+        $product = SanPham::with(['chitietsanpham.mausac', 'chitietsanpham.size'])->find($productId);
+        if (!$product) {
+            return [
+                'success' => false,
+                'message' => 'Sản phẩm không tồn tại'
+            ];
+        }
+
+        $cart = $this->getCart();
+        
+        Log::info('Cart data in getDetailedStockInfo:', [
+            'product_id' => $productId,
+            'cart' => $cart,
+            'cart_count' => count($cart)
+        ]);
+        
+        // Tính số lượng đã thêm vào giỏ cho sản phẩm chính
+        $mainCartQuantity = 0;
+        foreach ($cart as $item) {
+            Log::info('Checking cart item:', [
+                'item' => $item,
+                'product_match' => $item['product_id'] == $productId,
+                'variant_id' => $item['variant_id'],
+                'is_main_product' => !$item['variant_id']
+            ]);
+            
+            if ($item['product_id'] == $productId && !$item['variant_id']) {
+                $mainCartQuantity += $item['quantity'];
+                Log::info('Added to main cart quantity:', [
+                    'quantity' => $item['quantity'],
+                    'total_main_cart_quantity' => $mainCartQuantity
+                ]);
+            }
+        }
+        
+        Log::info('Main product cart quantity calculation:', [
+            'product_id' => $productId,
+            'main_cart_quantity' => $mainCartQuantity,
+            'cart_items' => $cart
+        ]);
+
+        // Tính số lượng đã thêm vào giỏ cho từng variant
+        $variantCartQuantities = [];
+        foreach ($cart as $item) {
+            if ($item['product_id'] == $productId && $item['variant_id']) {
+                $variantCartQuantities[$item['variant_id']] = ($variantCartQuantities[$item['variant_id']] ?? 0) + $item['quantity'];
+            }
+        }
+
+        // Tính stock hiển thị cho sản phẩm chính
+        $mainStock = max(0, ($product->soLuong ?? 0) - $mainCartQuantity);
+
+        // Tính stock hiển thị cho từng variant
+        $variantDetails = [];
+        $totalVariantStock = 0;
+        foreach ($product->chitietsanpham as $variant) {
+            $cartQuantity = $variantCartQuantities[$variant->id] ?? 0;
+            $displayStock = max(0, ($variant->soLuong ?? 0) - $cartQuantity);
+            
+            $variantDetails[] = [
+                'id' => $variant->id,
+                'color_name' => $variant->mausac ? $variant->mausac->ten : 'Không xác định',
+                'size_name' => $variant->size ? $variant->size->ten : 'Không xác định',
+                'stock' => $displayStock,
+                'original_stock' => $variant->soLuong ?? 0,
+                'cart_quantity' => $cartQuantity
+            ];
+            
+            $totalVariantStock += $displayStock;
+        }
+
+        return [
+            'success' => true,
+            'product_id' => $productId,
+            'main_stock' => $mainStock,
+            'main_original_stock' => $product->soLuong ?? 0,
+            'main_cart_quantity' => $mainCartQuantity,
+            'variant_details' => $variantDetails,
+            'total_variant_stock' => $totalVariantStock,
+            'total_stock' => $mainStock + $totalVariantStock
+        ];
     }
 
     // Method subtractDisplayStock đã được xóa vì không cần thiết

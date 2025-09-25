@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cart No Stock Validation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Cart - No Stock Validation</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Cart Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="cart-display">
+                            <p class="text-muted">Cart data will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="createTestCart()">Create Test Cart</button>
+                        <button class="btn btn-success mb-2" onclick="testHighQuantity()">Test High Quantity (100)</button>
+                        <button class="btn btn-warning mb-2" onclick="testZeroQuantity()">Test Zero Quantity</button>
+                        <button class="btn btn-info mb-2" onclick="testAnyQuantity()">Test Any Quantity</button>
+                        
+                        <div id="test-results" class="mt-3">
+                            <p class="text-muted">Click buttons to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Stock Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="stock-display">
+                            <p class="text-muted">Stock data will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Cart Behavior</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6>✅ New Behavior:</h6>
+                            <ul class="mb-0">
+                                <li>✅ <strong>No Stock Validation:</strong> Allow any quantity</li>
+                                <li>✅ <strong>Zero Notification:</strong> Only when quantity = 0</li>
+                                <li>✅ <strong>High Quantities:</strong> 100, 1000, etc. allowed</li>
+                                <li>✅ <strong>No Blocking:</strong> No "không đủ hàng" messages</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Pages</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/giohang" target="_blank" class="btn btn-primary mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Cart Page
+                        </a>
+                        
+                        <div class="alert alert-info">
+                            <h6>🔍 Expected Results:</h6>
+                            <ul class="mb-0">
+                                <li>✅ <strong>Any Quantity:</strong> 1, 10, 100, 1000 all allowed</li>
+                                <li>✅ <strong>No Stock Messages:</strong> No "không đủ hàng" notifications</li>
+                                <li>✅ <strong>Zero Notification:</strong> Only when quantity reaches 0</li>
+                                <li>✅ <strong>Smooth Operation:</strong> No blocking or errors</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createTestCart() {
+            const testCart = [
+                {
+                    product_id: 106,
+                    variant_id: 0,
+                    quantity: 5,
+                    name: 'Quần thun',
+                    price: 500000,
+                    image: '/backend/img/p1.jpg',
+                    color_name: null,
+                    size_name: null
+                },
+                {
+                    product_id: 106,
+                    variant_id: 136,
+                    quantity: 3,
+                    name: 'Quần thun',
+                    price: 22222,
+                    image: '/backend/img/p1.jpg',
+                    color_name: 'Đỏ',
+                    size_name: '38'
+                }
+            ];
+            
+            localStorage.setItem('cart_data', JSON.stringify(testCart));
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Test Cart Created:</h6>
+                    <p>2 items: Main product (5) + Variant (3)</p>
+                    <p>Total quantity: 8</p>
+                </div>
+            `;
+            
+            displayCartData();
+        }
+        
+        function testHighQuantity() {
+            const productId = 106;
+            const variantId = 0;
+            const quantity = 100; // Try high quantity
+            
+            try {
+                const cartData = localStorage.getItem('cart_data');
+                let cartItems = [];
+                
+                if (cartData) {
+                    cartItems = JSON.parse(cartData);
+                }
+                
+                const itemIndex = cartItems.findIndex(item => 
+                    item.product_id === productId && item.variant_id === variantId
+                );
+                
+                if (itemIndex !== -1) {
+                    cartItems[itemIndex].quantity = quantity;
+                    localStorage.setItem('cart_data', JSON.stringify(cartItems));
+                    
+                    document.getElementById('test-results').innerHTML = `
+                        <div class="alert alert-success">
+                            <h6>✅ High Quantity Set:</h6>
+                            <p>Product ${productId} (variant ${variantId}): ${quantity}</p>
+                            <p>No stock validation - high quantities allowed!</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('test-results').innerHTML = `
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Item Not Found:</h6>
+                            <p>Create test cart first</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Error:</h6>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            displayCartData();
+        }
+        
+        function testZeroQuantity() {
+            const productId = 106;
+            const variantId = 136;
+            const quantity = 0; // Try zero quantity
+            
+            try {
+                const cartData = localStorage.getItem('cart_data');
+                let cartItems = [];
+                
+                if (cartData) {
+                    cartItems = JSON.parse(cartData);
+                }
+                
+                const itemIndex = cartItems.findIndex(item => 
+                    item.product_id === productId && item.variant_id === variantId
+                );
+                
+                if (itemIndex !== -1) {
+                    cartItems[itemIndex].quantity = quantity;
+                    localStorage.setItem('cart_data', JSON.stringify(cartItems));
+                    
+                    document.getElementById('test-results').innerHTML = `
+                        <div class="alert alert-info">
+                            <h6>ℹ️ Zero Quantity Set:</h6>
+                            <p>Product ${productId} (variant ${variantId}): ${quantity}</p>
+                            <p>Should show "Sản phẩm đã hết số lượng!" notification</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('test-results').innerHTML = `
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Item Not Found:</h6>
+                            <p>Create test cart first</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Error:</h6>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            displayCartData();
+        }
+        
+        function testAnyQuantity() {
+            const productId = 106;
+            const variantId = 0;
+            const quantity = 999; // Try very high quantity
+            
+            try {
+                const cartData = localStorage.getItem('cart_data');
+                let cartItems = [];
+                
+                if (cartData) {
+                    cartItems = JSON.parse(cartData);
+                }
+                
+                const itemIndex = cartItems.findIndex(item => 
+                    item.product_id === productId && item.variant_id === variantId
+                );
+                
+                if (itemIndex !== -1) {
+                    cartItems[itemIndex].quantity = quantity;
+                    localStorage.setItem('cart_data', JSON.stringify(cartItems));
+                    
+                    document.getElementById('test-results').innerHTML = `
+                        <div class="alert alert-success">
+                            <h6>✅ Any Quantity Allowed:</h6>
+                            <p>Product ${productId} (variant ${variantId}): ${quantity}</p>
+                            <p>No stock validation - any quantity allowed!</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('test-results').innerHTML = `
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Item Not Found:</h6>
+                            <p>Create test cart first</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Error:</h6>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            displayCartData();
+        }
+        
+        function displayCartData() {
+            const cartData = localStorage.getItem('cart_data');
+            let cartItems = [];
+            
+            if (cartData) {
+                try {
+                    cartItems = JSON.parse(cartData);
+                } catch (error) {
+                    console.error('Error parsing cart data:', error);
+                }
+            }
+            
+            if (cartItems.length === 0) {
+                document.getElementById('cart-display').innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>📭 Empty Cart</h6>
+                        <p>No items in cart</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            document.getElementById('cart-display').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>🛒 Cart Summary:</h6>
+                    <p><strong>Total Items:</strong> ${cartItems.length}</p>
+                    <p><strong>Total Quantity:</strong> ${totalQuantity}</p>
+                    <p><strong>Total Price:</strong> ${new Intl.NumberFormat('vi-VN').format(totalPrice)}₫</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${cartItems.map(item => `
+                                <tr class="${item.quantity === 0 ? 'table-warning' : ''}">
+                                    <td>${item.name || 'Sản phẩm'}</td>
+                                    <td>
+                                        <span class="badge ${item.variant_id ? 'bg-info' : 'bg-primary'}">
+                                            ${item.variant_id ? 'Biến thể' : 'Sản phẩm chính'}
+                                        </span>
+                                    </td>
+                                    <td>${new Intl.NumberFormat('vi-VN').format(item.price)}₫</td>
+                                    <td class="${item.quantity === 0 ? 'text-warning fw-bold' : ''}">${item.quantity}</td>
+                                    <td>${new Intl.NumberFormat('vi-VN').format(item.price * item.quantity)}₫</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function displayStockData() {
+            const productId = 106;
+            const storageKey = `product_stock_${productId}`;
+            const stored = localStorage.getItem(storageKey);
+            
+            if (!stored) {
+                document.getElementById('stock-display').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>📭 No Stock Data</h6>
+                        <p>No stock data found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const stockData = JSON.parse(stored);
+            
+            document.getElementById('stock-display').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Current Stock:</h6>
+                    <p><strong>Main Product:</strong> ${stockData.mainStock || 0}</p>
+                    <p><strong>Variants:</strong></p>
+                    <ul class="mb-0">
+                        ${Object.entries(stockData.variants || {}).map(([key, value]) => 
+                            `<li>${key}: ${value}</li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        // Auto-load on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Cart no stock validation test page loaded');
+            displayCartData();
+            displayStockData();
+        });
+    </script>
+</body>
+</html>

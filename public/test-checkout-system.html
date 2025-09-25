@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Checkout System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section h3 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.success {
+            background: #28a745;
+        }
+        .test-button.error {
+            background: #dc3545;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .result.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .result.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Checkout System</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Cart Data Setup</h3>
+        <button class="test-button" onclick="setupTestCartData()">Setup Test Cart Data</button>
+        <button class="test-button" onclick="clearCartData()">Clear Cart Data</button>
+        <div id="cart-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Location Data</h3>
+        <button class="test-button" onclick="setupTestLocationData()">Setup Test Location Data</button>
+        <button class="test-button" onclick="clearLocationData()">Clear Location Data</button>
+        <div id="location-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Checkout Manager</h3>
+        <button class="test-button" onclick="testCheckoutManager()">Test Checkout Manager</button>
+        <button class="test-button" onclick="testVoucherCheck()">Test Voucher Check</button>
+        <div id="checkout-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Test Order Processing</h3>
+        <button class="test-button" onclick="testOrderProcessing()">Test Order Processing</button>
+        <div id="order-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. Current Data Status</h3>
+        <button class="test-button" onclick="showCurrentData()">Show Current Data</button>
+        <div id="data-status" class="result"></div>
+    </div>
+
+    <script>
+        // Test cart data setup
+        function setupTestCartData() {
+            const testCartData = [
+                {
+                    product_id: 106,
+                    variant_id: 0,
+                    name: "Quần thun",
+                    price: 500000,
+                    quantity: 10,
+                    image: "/backend/img/p1.jpg",
+                    variant_name: "Sản phẩm chính"
+                },
+                {
+                    product_id: 106,
+                    variant_id: 137,
+                    name: "Quần thun",
+                    price: 8000000,
+                    quantity: 6,
+                    image: "/backend/img/p1.jpg",
+                    variant_name: "Vàng - L",
+                    color_name: "Vàng",
+                    size_name: "L"
+                }
+            ];
+            
+            localStorage.setItem('cart_data', JSON.stringify(testCartData));
+            
+            document.getElementById('cart-result').innerHTML = `
+                <div class="result success">
+                    ✅ Test cart data setup thành công!<br>
+                    - ${testCartData.length} sản phẩm trong giỏ hàng<br>
+                    - Tổng tiền: ${new Intl.NumberFormat('vi-VN').format(testCartData.reduce((sum, item) => sum + (item.price * item.quantity), 0))}₫
+                </div>
+            `;
+        }
+
+        function clearCartData() {
+            localStorage.removeItem('cart_data');
+            document.getElementById('cart-result').innerHTML = `
+                <div class="result success">
+                    ✅ Cart data đã được xóa!
+                </div>
+            `;
+        }
+
+        // Test location data setup
+        function setupTestLocationData() {
+            const testLocationData = {
+                province: "Bắc Giang",
+                province_code: "54",
+                district: "Tân Yên",
+                district_code: "543",
+                ward: "Ngọc Châu",
+                ward_code: "21634",
+                address_detail: "123 Đường ABC",
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('user_location_data', JSON.stringify(testLocationData));
+            
+            document.getElementById('location-result').innerHTML = `
+                <div class="result success">
+                    ✅ Test location data setup thành công!<br>
+                    - Tỉnh: ${testLocationData.province}<br>
+                    - Huyện: ${testLocationData.district}<br>
+                    - Xã: ${testLocationData.ward}<br>
+                    - Địa chỉ: ${testLocationData.address_detail}
+                </div>
+            `;
+        }
+
+        function clearLocationData() {
+            localStorage.removeItem('user_location_data');
+            document.getElementById('location-result').innerHTML = `
+                <div class="result success">
+                    ✅ Location data đã được xóa!
+                </div>
+            `;
+        }
+
+        // Test checkout manager
+        function testCheckoutManager() {
+            const cartData = localStorage.getItem('cart_data');
+            const locationData = localStorage.getItem('user_location_data');
+            
+            if (!cartData) {
+                document.getElementById('checkout-result').innerHTML = `
+                    <div class="result error">
+                        ❌ Không có cart data! Vui lòng setup test cart data trước.
+                    </div>
+                `;
+                return;
+            }
+            
+            const cartItems = JSON.parse(cartData);
+            const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            document.getElementById('checkout-result').innerHTML = `
+                <div class="result success">
+                    ✅ Checkout Manager Test:<br>
+                    - Cart items: ${cartItems.length}<br>
+                    - Total amount: ${new Intl.NumberFormat('vi-VN').format(totalAmount)}₫<br>
+                    - Location data: ${locationData ? 'Có' : 'Không có'}<br>
+                    - Ready for checkout: ${cartItems.length > 0 ? '✅' : '❌'}
+                </div>
+            `;
+        }
+
+        // Test voucher check
+        async function testVoucherCheck() {
+            const cartData = localStorage.getItem('cart_data');
+            if (!cartData) {
+                document.getElementById('checkout-result').innerHTML = `
+                    <div class="result error">
+                        ❌ Không có cart data! Vui lòng setup test cart data trước.
+                    </div>
+                `;
+                return;
+            }
+            
+            const cartItems = JSON.parse(cartData);
+            const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            try {
+                const response = await fetch('/checkout/check-voucher', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 'test-token'
+                    },
+                    body: JSON.stringify({
+                        voucher_code: 'TEST10',
+                        total_amount: totalAmount
+                    })
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('checkout-result').innerHTML = `
+                    <div class="result ${data.success ? 'success' : 'error'}">
+                        ${data.success ? '✅' : '❌'} Voucher Test:<br>
+                        - Response: ${JSON.stringify(data, null, 2)}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('checkout-result').innerHTML = `
+                    <div class="result error">
+                        ❌ Voucher Test Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test order processing
+        async function testOrderProcessing() {
+            const cartData = localStorage.getItem('cart_data');
+            if (!cartData) {
+                document.getElementById('order-result').innerHTML = `
+                    <div class="result error">
+                        ❌ Không có cart data! Vui lòng setup test cart data trước.
+                    </div>
+                `;
+                return;
+            }
+            
+            const testOrderData = {
+                hoten: 'Nguyễn Văn Test',
+                email: 'test@example.com',
+                sodienthoai: '0123456789',
+                diachigiaohang: '123 Đường ABC, Ngọc Châu, Tân Yên, Bắc Giang',
+                phuongthucthanhtoan: 'cod',
+                ghichu: 'Test order từ hệ thống',
+                cart_data: cartData
+            };
+            
+            try {
+                const response = await fetch('/checkout/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 'test-token'
+                    },
+                    body: JSON.stringify(testOrderData)
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('order-result').innerHTML = `
+                    <div class="result ${data.success ? 'success' : 'error'}">
+                        ${data.success ? '✅' : '❌'} Order Processing Test:<br>
+                        - Success: ${data.success}<br>
+                        - Message: ${data.message}<br>
+                        - Order ID: ${data.order_id || 'N/A'}<br>
+                        - Response: ${JSON.stringify(data, null, 2)}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('order-result').innerHTML = `
+                    <div class="result error">
+                        ❌ Order Processing Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Show current data status
+        function showCurrentData() {
+            const cartData = localStorage.getItem('cart_data');
+            const locationData = localStorage.getItem('user_location_data');
+            const appliedVoucher = sessionStorage.getItem('applied_voucher');
+            
+            let cartInfo = 'Không có';
+            if (cartData) {
+                const cartItems = JSON.parse(cartData);
+                const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                cartInfo = `${cartItems.length} items, Total: ${new Intl.NumberFormat('vi-VN').format(totalAmount)}₫`;
+            }
+            
+            let locationInfo = 'Không có';
+            if (locationData) {
+                const loc = JSON.parse(locationData);
+                locationInfo = `${loc.province} - ${loc.district} - ${loc.ward}`;
+            }
+            
+            let voucherInfo = 'Không có';
+            if (appliedVoucher) {
+                const voucher = JSON.parse(appliedVoucher);
+                voucherInfo = `${voucher.ma_voucher || voucher.code} - ${voucher.ten_voucher || voucher.name}`;
+            }
+            
+            document.getElementById('data-status').innerHTML = `
+                <div class="result success">
+                    📊 Current Data Status:<br>
+                    - Cart Data: ${cartInfo}<br>
+                    - Location Data: ${locationInfo}<br>
+                    - Applied Voucher: ${voucherInfo}<br>
+                    - Timestamp: ${new Date().toLocaleString('vi-VN')}
+                </div>
+            `;
+        }
+
+        // Auto-run initial test
+        window.onload = function() {
+            showCurrentData();
+        };
+    </script>
+</body>
+</html>

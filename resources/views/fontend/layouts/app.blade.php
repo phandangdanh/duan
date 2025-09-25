@@ -21,8 +21,12 @@
   @yield('content')
   @include('fontend.layouts.partials.footer')
 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- API System -->
+  <script src="{{ asset('fontend/js/api/index.js') }}"></script>
   
   <!-- Cart Count Update Script -->
   <script>
@@ -31,45 +35,88 @@
       updateCartCount();
     });
 
-    // Function để cập nhật số lượng giỏ hàng
+    // Function để cập nhật số lượng giỏ hàng từ localStorage
     function updateCartCount() {
-      fetch('/cart/info')
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            const cartCountElement = document.querySelector('.cart-count');
-            if (cartCountElement) {
-              cartCountElement.textContent = data.cart_count;
-              // Ẩn badge nếu giỏ hàng trống
-              if (data.cart_count === 0) {
-                cartCountElement.style.display = 'none';
-              } else {
-                cartCountElement.style.display = 'inline-block';
+      try {
+        // Load cart data from localStorage
+        const cartData = localStorage.getItem('cart_data');
+        let cartCount = 0;
+        
+        if (cartData) {
+          const cartItems = JSON.parse(cartData);
+          cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+        }
+        
+        const cartCountElement = document.querySelector('.cart-count');
+        if (cartCountElement) {
+          cartCountElement.textContent = cartCount;
+          // Ẩn badge nếu giỏ hàng trống
+          if (cartCount === 0) {
+            cartCountElement.style.display = 'none';
+          } else {
+            cartCountElement.style.display = 'inline-block';
+          }
+        }
+        
+        console.log('Cart count updated from localStorage:', cartCount);
+      } catch (error) {
+        console.error('Error updating cart count from localStorage:', error);
+        // Fallback to server API if localStorage fails
+        fetch('/cart/info')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              const cartCountElement = document.querySelector('.cart-count');
+              if (cartCountElement) {
+                cartCountElement.textContent = data.cart_count;
+                if (data.cart_count === 0) {
+                  cartCountElement.style.display = 'none';
+                } else {
+                  cartCountElement.style.display = 'inline-block';
+                }
               }
             }
-          }
-        })
-        .catch(error => {
-          console.error('Error updating cart count:', error);
-        });
+          })
+          .catch(error => {
+            console.error('Error updating cart count from server:', error);
+          });
+      }
     }
 
     // Function để thêm vào giỏ hàng (có thể gọi từ các trang khác)
     function addToCart(productId, variantId = null, quantity = 1) {
+      console.log('=== addToCart global called ===');
+      console.log('Product ID:', productId);
+      console.log('Variant ID:', variantId);
+      console.log('Quantity:', quantity);
+      
+      const requestData = {
+        product_id: productId,
+        variant_id: variantId,
+        quantity: quantity
+      };
+      
+      console.log('Request data:', requestData);
+      
       return fetch('/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({
-          product_id: productId,
-          variant_id: variantId,
-          quantity: quantity
-        })
+        body: JSON.stringify(requestData)
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Cart add response status:', response.status);
+        return response.json();
+      })
       .then(data => {
+        console.log('=== Cart add response data ===');
+        console.log('Response success:', data.success);
+        console.log('Response message:', data.message);
+        console.log('Full response:', data);
+        console.log('=== End Cart add response ===');
+        
         if (data.success) {
           // Cập nhật số lượng giỏ hàng
           updateCartCount();
@@ -87,6 +134,22 @@
         // Không hiển thị thông báo lỗi ở đây vì đã hiển thị ở trên
         throw error;
       });
+    }
+
+    // Function mua ngay từ trang chủ (đơn giản)
+    function buyNowFromHomepage(productId) {
+      console.log('=== buyNowFromHomepage called ===');
+      console.log('Product ID:', productId);
+      
+      // Kiểm tra sản phẩm có tồn tại không
+      if (!productId) {
+        showNotification('Sản phẩm không hợp lệ!', 'error');
+        return;
+      }
+      
+      // Đơn giản: redirect trực tiếp đến checkout với product_id
+      console.log('Redirecting to checkout with product_id:', productId);
+      window.location.href = `/checkout?product_id=${productId}&quantity=1`;
     }
 
     // Function hiển thị thông báo

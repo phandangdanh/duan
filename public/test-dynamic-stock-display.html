@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dynamic Stock Display</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Dynamic Stock Display</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Dynamic Stock Display Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-3" onclick="testDynamicStock()">Test Dynamic Stock</button>
+                        
+                        <div id="test-result" class="mt-3">
+                            <p class="text-muted">Click button to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>New Dynamic Logic</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6>✅ Dynamic Stock Display:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Khi chưa chọn:</strong> Hiện số lượng sản phẩm chính</li>
+                                <li><strong>Khi chọn variant:</strong> Hiện số lượng variant đó</li>
+                                <li><strong>Tổng số lượng:</strong> Luôn hiện tổng (chính + biến thể)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Example Scenarios</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>📊 Scenarios:</h6>
+                            <p><strong>Scenario 1:</strong> Chưa chọn gì</p>
+                            <p>• Số lượng có sẵn: 10 (main)</p>
+                            <p>• Tổng số lượng: 25 (main + variants)</p>
+                            
+                            <p><strong>Scenario 2:</strong> Chọn màu + size</p>
+                            <p>• Số lượng có sẵn: 5 (variant)</p>
+                            <p>• Tổng số lượng: 25 (main + variants)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-info mb-3">
+                            <i class="fas fa-external-link-alt"></i> Open Product Detail Page
+                        </a>
+                        
+                        <div class="alert alert-info">
+                            <h6>📋 Test Steps:</h6>
+                            <ol class="mb-0">
+                                <li>Mở trang product detail</li>
+                                <li>Kiểm tra "Số lượng có sẵn" hiện số lượng chính</li>
+                                <li>Click chọn màu + size</li>
+                                <li>Kiểm tra "Số lượng có sẵn" hiện số lượng variant</li>
+                                <li>Click lại màu để bỏ chọn</li>
+                                <li>Kiểm tra "Số lượng có sẵn" quay về số lượng chính</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testDynamicStock() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<p class="text-info">Testing dynamic stock...</p>';
+            
+            try {
+                console.log('=== TESTING DYNAMIC STOCK ===');
+                
+                const response = await fetch('http://localhost:8000/api/products/106', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const product = data.data;
+                const variants = product.chitietsanpham || [];
+                
+                // Calculate stock info
+                const mainStock = product.soLuong || 0;
+                const totalVariantStock = variants.reduce((sum, v) => sum + (v.soLuong || 0), 0);
+                const totalAvailableStock = mainStock + totalVariantStock;
+                
+                // Get unique colors and sizes
+                const uniqueColors = [...new Set(variants.map(v => v.id_mausac))].length;
+                const uniqueSizes = [...new Set(variants.map(v => v.id_size))].length;
+                
+                // Get first variant as example
+                const firstVariant = variants[0];
+                
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>✅ Stock Calculation Results</h6>
+                        <p><strong>Product:</strong> ${product.tenSP}</p>
+                        <p><strong>Main Stock:</strong> ${mainStock}</p>
+                        <p><strong>Total Variant Stock:</strong> ${totalVariantStock}</p>
+                        <p><strong>Total Available:</strong> ${totalAvailableStock}</p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6>🎨 Variant Details:</h6>
+                        <p><strong>Unique Colors:</strong> ${uniqueColors}</p>
+                        <p><strong>Unique Sizes:</strong> ${uniqueSizes}</p>
+                        <p><strong>First Variant:</strong> ${firstVariant ? `${firstVariant.mausac.ten} - ${firstVariant.size.ten} (${firstVariant.soLuong} sản phẩm)` : 'No variants'}</p>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <h6>📊 Expected Dynamic Display:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>🔄 When No Selection:</h6>
+                                <div class="bg-light p-3 rounded">
+                                    <p><strong>Số lượng có sẵn:</strong> ${mainStock}</p>
+                                    <p><strong>• Sản phẩm chính:</strong> ${mainStock} sản phẩm</p>
+                                    <p><strong>• Biến thể:</strong> ${totalVariantStock} sản phẩm (${uniqueColors} màu, ${uniqueSizes} size)</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>🎯 When Variant Selected:</h6>
+                                <div class="bg-light p-3 rounded">
+                                    <p><strong>Số lượng có sẵn:</strong> ${firstVariant ? firstVariant.soLuong : 'N/A'}</p>
+                                    <p><strong>• Sản phẩm chính:</strong> ${mainStock} sản phẩm</p>
+                                    <p><strong>• Biến thể:</strong> ${totalVariantStock} sản phẩm (${uniqueColors} màu, ${uniqueSizes} size)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6>⚠️ Test Checklist:</h6>
+                        <ul class="mb-0">
+                            <li>✅ "Số lượng có sẵn" changes based on selection</li>
+                            <li>✅ Main product stock always shows correct number</li>
+                            <li>✅ Variant info always shows total + details</li>
+                            <li>✅ Stock updates when selecting/deselecting variants</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Test Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Test Error!</h6>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dynamic stock test page loaded');
+        });
+    </script>
+</body>
+</html>

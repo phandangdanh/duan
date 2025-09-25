@@ -13,6 +13,7 @@ use App\Http\Controllers\Backend\SanPhamColorController;
 use App\Http\Controllers\Backend\DonHangController;
 use App\Http\Controllers\Backend\StoreSettingsController;
 use App\Http\Controllers\Backend\VoucherController;
+use App\Http\Controllers\VNPayController;
 
 // Ajax Controllers
 use App\Http\Controllers\Ajax\LocationController;
@@ -123,6 +124,7 @@ Route::prefix('ajax/donhang')->name('ajax.donhang.')->group(function () {
         }
         return response()->json(['status' => 'unauthorized'], 401);
     })->name('admin.check.session');
+    
 });
 }); // Đóng group middleware cho AJAX routes
 
@@ -394,10 +396,12 @@ Route::group(['prefix' => 'admin/vouchers'], function () {
 // Home
 Route::get('/', [\App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/trangchu', [\App\Http\Controllers\Frontend\HomeController::class, 'index']);
+Route::get('/trangchu-api', [\App\Http\Controllers\Frontend\HomeController::class, 'indexApi'])->name('home.api');
 
 // Products
 Route::get('/sanpham', [\App\Http\Controllers\Frontend\ProductController::class, 'index'])->name('products');
 Route::get('/sanpham/{id}', [\App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('product.detail');
+Route::get('/sanpham-api/{id}', [\App\Http\Controllers\Frontend\ProductController::class, 'showApi'])->name('product.detail.api');
 
 // Categories
 Route::get('/danh-muc/{slug}', [\App\Http\Controllers\Frontend\CategoryController::class, 'show'])->name('category.show');
@@ -418,6 +422,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout/success/{orderId}', [\App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('/checkout/failure/{orderId}', [\App\Http\Controllers\Frontend\CheckoutController::class, 'failure'])->name('checkout.failure');
     Route::post('/checkout/check-voucher', [\App\Http\Controllers\Frontend\CheckoutController::class, 'checkVoucher'])->name('checkout.check.voucher');
+});
+
+// Order routes - yêu cầu đăng nhập
+Route::middleware(['auth'])->group(function () {
+    Route::get('/don-hang', [\App\Http\Controllers\Frontend\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/don-hang/{id}', [\App\Http\Controllers\Frontend\OrderController::class, 'show'])->name('orders.detail');
+    Route::post('/don-hang/{id}/cancel', [\App\Http\Controllers\Frontend\OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/don-hang/{id}/reorder', [\App\Http\Controllers\Frontend\OrderController::class, 'reorder'])->name('orders.reorder');
+    
+    // Bank payment routes
+    Route::get('/thanh-toan-ngan-hang/{id}', [\App\Http\Controllers\Frontend\BankPaymentController::class, 'showBankInfo'])->name('bank.payment.info');
+    Route::post('/thanh-toan-ngan-hang/{id}/confirm', [\App\Http\Controllers\Frontend\BankPaymentController::class, 'confirmPayment'])->name('bank.payment.confirm');
 });
 
 // Static pages
@@ -446,3 +462,31 @@ Route::post('/dat-lai-mat-khau', [\App\Http\Controllers\Auth\ResetPasswordContro
 Route::get('/sanpham-noi-bat', [\App\Http\Controllers\Frontend\ProductController::class, 'featured'])->name('products.featured');
 Route::get('/sanpham-khuyen-mai', [\App\Http\Controllers\Frontend\ProductController::class, 'sale'])->name('products.sale');
 Route::get('/sanpham-ban-chay', [\App\Http\Controllers\Frontend\ProductController::class, 'bestselling'])->name('products.bestselling');
+
+// Payment check route
+Route::get('/checkout/check-payment', function () {
+    return view('fontend.checkout.check-payment');
+})->name('checkout.check-payment');
+
+// Payment success route
+Route::get('/checkout/payment-success', function () {
+    return view('fontend.checkout.payment-success');
+})->name('checkout.payment-success');
+
+// Test payment API route
+Route::get('/test-payment-api', function () {
+    $totalOrders = \App\Models\DonHang::count();
+    $firstOrder = $totalOrders > 0 ? \App\Models\DonHang::first() : null;
+    
+    return response()->json([
+        'total_orders' => $totalOrders,
+        'first_order' => $firstOrder ? [
+            'id' => $firstOrder->id,
+            'phone' => $firstOrder->sodienthoai,
+            'payment_status' => $firstOrder->trangthaithanhtoan ?? 0,
+            'total_amount' => $firstOrder->tongtien
+        ] : null
+    ]);
+});
+
+

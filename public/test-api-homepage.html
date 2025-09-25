@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Homepage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test API Homepage</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>API Endpoints Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="testAllData()">Test All Data</button>
+                        <button class="btn btn-success mb-2" onclick="testFeaturedProducts()">Test Featured Products</button>
+                        <button class="btn btn-warning mb-2" onclick="testSaleProducts()">Test Sale Products</button>
+                        <button class="btn btn-info mb-2" onclick="testCategories()">Test Categories</button>
+                        <button class="btn btn-secondary mb-2" onclick="testStatistics()">Test Statistics</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="results" style="max-height: 400px; overflow-y: auto;">
+                            <p class="text-muted">Click buttons to test API endpoints...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>API Homepage</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="/trangchu-api" class="btn btn-primary">View API Homepage</a>
+                        <a href="/trangchu" class="btn btn-outline-primary">View Original Homepage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load API System -->
+    <script src="/fontend/js/api/index.js"></script>
+    <script src="/fontend/js/home-api.js"></script>
+
+    <script>
+        function logResult(message, data = null) {
+            const resultsDiv = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'mb-2 p-2 border rounded';
+            logEntry.innerHTML = `
+                <small class="text-muted">[${timestamp}]</small>
+                <strong>${message}</strong>
+                ${data ? `<pre class="mt-2 small">${JSON.stringify(data, null, 2)}</pre>` : ''}
+            `;
+            resultsDiv.insertBefore(logEntry, resultsDiv.firstChild);
+        }
+
+        async function testAllData() {
+            try {
+                logResult('Testing getAllData()...');
+                const data = await window.API.home.getAllData();
+                logResult('✅ getAllData() success', data);
+            } catch (error) {
+                logResult('❌ getAllData() error', { error: error.message });
+            }
+        }
+
+        async function testFeaturedProducts() {
+            try {
+                logResult('Testing getFeaturedProducts()...');
+                const products = await window.API.home.getFeaturedProducts(4);
+                logResult('✅ getFeaturedProducts() success', products);
+            } catch (error) {
+                logResult('❌ getFeaturedProducts() error', { error: error.message });
+            }
+        }
+
+        async function testSaleProducts() {
+            try {
+                logResult('Testing getSaleProducts()...');
+                const products = await window.API.home.getSaleProducts(4);
+                logResult('✅ getSaleProducts() success', products);
+            } catch (error) {
+                logResult('❌ getSaleProducts() error', { error: error.message });
+            }
+        }
+
+        async function testCategories() {
+            try {
+                logResult('Testing getFeaturedCategories()...');
+                const categories = await window.API.home.getFeaturedCategories(4);
+                logResult('✅ getFeaturedCategories() success', categories);
+            } catch (error) {
+                logResult('❌ getFeaturedCategories() error', { error: error.message });
+            }
+        }
+
+        async function testStatistics() {
+            try {
+                logResult('Testing getStatistics()...');
+                const stats = await window.API.home.getStatistics();
+                logResult('✅ getStatistics() success', stats);
+            } catch (error) {
+                logResult('❌ getStatistics() error', { error: error.message });
+            }
+        }
+
+        // Test API connection on page load
+        document.addEventListener('apiReady', function(event) {
+            logResult('🎉 API System Ready!', { api: 'Available' });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            logResult('📄 Page loaded, waiting for API...');
+        });
+    </script>
+</body>
+</html>

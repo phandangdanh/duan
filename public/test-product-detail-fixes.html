@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Product Detail Fixes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Product Detail Fixes</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Latest Fixes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6>✅ Fixed Issues:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Selector Fix:</strong> Added .variant-group to selector path</li>
+                                <li><strong>Fallback Selector:</strong> Alternative method if primary fails</li>
+                                <li><strong>Duplicate Prevention:</strong> Added check in HTML script</li>
+                                <li><strong>Debug Logging:</strong> Enhanced logging for troubleshooting</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Expected Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>🎯 Should See:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Color section found:</strong> [HTMLDivElement] (not null)</li>
+                                <li><strong>Size section found:</strong> [HTMLDivElement] (not null)</li>
+                                <li><strong>Color options:</strong> Đỏ, Vàng buttons appear</li>
+                                <li><strong>Size options:</strong> Show when color selected</li>
+                                <li><strong>Single init:</strong> No duplicate initialization</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-primary mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Product Detail Page
+                        </a>
+                        
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Check Console Logs:</h6>
+                            <pre class="bg-light p-3">
+Expected Console Output:
+=== INITIALIZING PRODUCT DETAIL ===
+Product ID from URL: 106
+Loading product detail for ID: 106
+Product detail response: Object
+Processing product data: Object
+Rendering product detail... Object
+Product title updated: Quần thun
+Rendering color options...
+renderColorOptions called
+Color section found: [HTMLDivElement] ✅
+Rendering size options...
+renderSizeOptions called
+Size section found: [HTMLDivElement] ✅
+Product detail rendering completed
+                            </pre>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h6>📋 Test Steps:</h6>
+                            <ol class="mb-0">
+                                <li>Open Product Detail Page</li>
+                                <li>Open Browser Console (F12)</li>
+                                <li>Check "Color section found" is NOT null</li>
+                                <li>Check "Size section found" is NOT null</li>
+                                <li>Verify color buttons (Đỏ, Vàng) appear</li>
+                                <li>Click a color to see size options</li>
+                                <li>Verify no duplicate initialization logs</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>HTML Structure Reference</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="bg-light p-3">
+HTML Structure:
+.variant-section:nth-child(2)  (Color section)
+  └── .variant-group
+      └── .variant-options  ← Target element
+
+.variant-section:nth-child(3)  (Size section)
+  └── .variant-group
+      └── .variant-options  ← Target element
+
+JavaScript Selectors:
+Primary: '.variant-section:nth-child(2) .variant-group .variant-options'
+Fallback: document.querySelectorAll('.variant-section')[1]?.querySelector('.variant-options')
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page loaded');
+        });
+    </script>
+</body>
+</html>

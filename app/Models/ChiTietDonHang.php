@@ -38,7 +38,7 @@ class ChiTietDonHang extends Model
 
     public function chiTietSanPham()
     {
-        return $this->belongsTo(ChiTietSanPham::class, 'id_chitietsanpham');
+        return $this->belongsTo(ChiTietSanPham::class, 'id_chitietsanpham')->withDefault();
     }
 
     // Accessor cho giá tiền

@@ -156,7 +156,7 @@
               
               <div class="d-flex justify-content-center gap-2">
                 <a href="{{ route('product.detail', $product->id) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Xem chi tiết</a>
-                <button class="btn btn-danger btn-sm rounded-pill px-3">Mua ngay</button>
+                <button class="btn btn-danger btn-sm rounded-pill px-3" onclick="buyNowFromHomepage({{ $product->id }})">Mua ngay</button>
               </div>
             </div>
           </div>
@@ -186,23 +186,24 @@
       @foreach($saleProducts->take(6) as $product)
         <div class="col-12 col-sm-6 col-md-4 col-lg-2">
           <div class="card border-0 shadow-lg h-100 position-relative hover-lift">
-            @if($product->hinhanh->isNotEmpty())
-              @php
-                $imageUrl = $product->hinhanh->first()->url;
-                if (!str_starts_with($imageUrl, 'storage/')) {
-                  $imageUrl = 'storage/' . $imageUrl;
-                }
-              @endphp
-              <img src="{{ asset($imageUrl) }}" 
+            @php
+              // Logic giống như trong sản phẩm nổi bật
+              $defaultImage = optional($product->hinhanh->where('is_default', 1)->first())->url;
+              $imageExists = $defaultImage ? file_exists(public_path($defaultImage)) : false;
+            @endphp
+            @if($defaultImage && $imageExists)
+              <img src="{{ asset($defaultImage) }}" 
                    class="card-img-top" 
-                   style="height: 150px; object-fit: cover;" 
-                   alt="{{ $product->tenSP }}"
-                   onerror="this.src='{{ asset('fontend/img/aosomi1.png') }}'">
-            @else
-              <img src="{{ asset('fontend/img/aosomi1.png') }}" 
-                   class="card-img-top" 
-                   style="height: 150px; object-fit: cover;" 
+                   style="height: 150px; object-fit: cover; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;" 
                    alt="{{ $product->tenSP }}">
+            @else
+              <div class="card-img-top d-flex align-items-center justify-content-center bg-light" 
+                   style="height: 150px; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">
+                <div class="text-center text-muted">
+                  <i class="fas fa-image fa-2x mb-2"></i>
+                  <p class="mb-0 small">Không có ảnh</p>
+                </div>
+              </div>
             @endif
             
             <span class="badge bg-danger position-absolute top-0 start-0 m-2">Sale</span>
@@ -241,7 +242,7 @@
               
               <div class="d-flex gap-2">
                 <a href="{{ route('product.detail', $product->id) }}" class="btn btn-outline-primary btn-sm flex-fill">Xem chi tiết</a>
-                <button class="btn btn-danger btn-sm" onclick="addToCart({{ $product->id }})">Mua ngay</button>
+                <button class="btn btn-danger btn-sm" onclick="buyNowFromHomepage({{ $product->id }})">Mua ngay</button>
               </div>
             </div>
           </div>
@@ -349,7 +350,7 @@
               
               <div class="d-flex gap-2">
                 <a href="{{ route('product.detail', $product->id) }}" class="btn btn-outline-success btn-sm flex-fill">Xem chi tiết</a>
-                <button class="btn btn-success btn-sm" onclick="addToCart({{ $product->id }})">Mua ngay</button>
+                <button class="btn btn-success btn-sm" onclick="buyNowFromHomepage({{ $product->id }})">Mua ngay</button>
               </div>
             </div>
           </div>
@@ -367,37 +368,6 @@
 </section>
 @endif
 
-<footer class="bg-warning text-dark mt-5 pt-5 pb-4">
-  <div class="container text-md-left">
-    <div class="row">
-      <div class="col-md-4 mb-4">
-        <h5 class="text-uppercase fw-bold mb-3">Thông tin liên hệ</h5>
-        <ul class="list-unstyled">
-          <li>Địa chỉ: TP.HCM</li>
-          <li>Email: support@thriftzone.vn</li>
-          <li>Điện thoại: 0909 123 456</li>
-        </ul>
-      </div>
-      <div class="col-md-4 mb-4">
-        <h5 class="text-uppercase fw-bold mb-3">Về ThriftZone</h5>
-        <ul class="list-unstyled">
-          <li><a href="#" class="text-dark text-decoration-none">Giới thiệu</a></li>
-          <li><a href="#" class="text-dark text-decoration-none">Chính sách đổi trả</a></li>
-          <li><a href="#" class="text-dark text-decoration-none">Hướng dẫn mua hàng</a></li>
-        </ul>
-      </div>
-      <div class="col-md-4 mb-4">
-        <h5 class="text-uppercase fw-bold mb-3">Hỗ trợ khách hàng</h5>
-        <ul class="list-unstyled">
-          <li><a href="#" class="text-dark text-decoration-none">Liên hệ</a></li>
-          <li><a href="#" class="text-dark text-decoration-none">FAQ</a></li>
-          <li><a href="#" class="text-dark text-decoration-none">Phản hồi</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="text-center pt-3 border-top border-dark mt-3">© 2025 <strong>ThriftZone</strong> – All rights reserved.</div>
-  </div>
-</footer>
 
 <script>
 // Function addToCart đã được định nghĩa trong layout chính

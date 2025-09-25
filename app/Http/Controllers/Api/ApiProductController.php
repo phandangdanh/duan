@@ -9,6 +9,7 @@ use App\Http\Requests\Api\ProductStoreRequest;
 use App\Http\Requests\Api\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Services\ApiProductService;
+use App\Models\SanPham;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -646,6 +647,269 @@ class ApiProductController extends Controller
                 'status_code' => 409,
                 'message' => 'Không thể xóa vĩnh viễn do ràng buộc dữ liệu liên quan.',
             ], 409);
+        }
+    }
+
+    /**
+     * Cập nhật stock hiển thị
+     */
+    public function updateStock(Request $request)
+    {
+        try {
+            $productId = $request->input('product_id');
+            
+            if (!$productId) {
+                return response()->json([
+                    'status_code' => 400,
+                    'message' => 'Thiếu product_id',
+                ], 400);
+            }
+
+            // Lấy sản phẩm
+            $product = \App\Models\Sanpham::find($productId);
+            if (!$product) {
+                return response()->json([
+                    'status_code' => 404,
+                    'message' => 'Không tìm thấy sản phẩm',
+                ], 404);
+            }
+
+            // Lấy số lượng trong giỏ hàng
+            $cartQuantity = 0;
+            if (session()->has('cart')) {
+                $cart = session('cart');
+                foreach ($cart as $item) {
+                    if ($item['product_id'] == $productId) {
+                        $cartQuantity += $item['quantity'];
+                    }
+                }
+            }
+
+            // Tính stock thực tế
+            $mainStock = $product->soLuong - $cartQuantity;
+            $variantStock = 0;
+            
+            // Tính stock của variants
+            if ($product->chitietsanpham) {
+                foreach ($product->chitietsanpham as $variant) {
+                    $variantStock += $variant->soLuong;
+                }
+            }
+
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Cập nhật stock thành công',
+                'main_stock' => max(0, $mainStock),
+                'variant_stock' => $variantStock,
+                'cart_quantity' => $cartQuantity,
+                'total_stock' => max(0, $mainStock) + $variantStock,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating stock: ' . $e->getMessage());
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Lỗi server khi cập nhật stock',
+            ], 500);
+        }
+    }
+
+    /**
+     * Lấy thông tin stock của sản phẩm
+     */
+    public function getStock($id)
+    {
+        try {
+            $product = SanPham::with(['chitietsanpham.mausac', 'chitietsanpham.size'])->find($id);
+            
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy sản phẩm'
+                ], 404);
+            }
+
+            // Debug: Log dữ liệu từ database
+            Log::info('Product stock data:', [
+                'product_id' => $product->id,
+                'main_stock' => $product->soLuong,
+                'variants_count' => $product->chitietsanpham->count()
+            ]);
+            
+            $variants = $product->chitietsanpham->map(function($variant) {
+                // Debug: Log từng variant
+                Log::info('Variant data:', [
+                    'id' => $variant->id,
+                    'color_name' => $variant->mausac ? $variant->mausac->ten : null,
+                    'size_name' => $variant->size ? $variant->size->ten : null,
+                    'stock' => $variant->soLuong,
+                    'price' => $variant->gia
+                ]);
+                
+                return [
+                    'id' => $variant->id,
+                    'color_id' => $variant->id_mausac,
+                    'color_name' => $variant->mausac ? $variant->mausac->ten : null,
+                    'color_code' => $variant->mausac ? $variant->mausac->ma_mau : null,
+                    'size_id' => $variant->id_size,
+                    'size_name' => $variant->size ? $variant->size->ten : null,
+                    'price' => $variant->gia,
+                    'sale_price' => $variant->gia_khuyenmai,
+                    'stock' => $variant->soLuong,
+                    'original_stock' => $variant->soLuong
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'product_id' => $product->id,
+                'main_stock' => $product->soLuong,
+                'variants' => $variants,
+                'total_variants' => $variants->count(),
+                'available_variants' => $variants->where('stock', '>', 0)->count(),
+                'out_of_stock_variants' => $variants->where('stock', '<=', 0)->count()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting stock: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi server khi lấy thông tin stock'
+            ], 500);
+        }
+    }
+
+    /**
+     * Lấy thông tin stock chi tiết cho trang sản phẩm
+     */
+    public function getDetailedStock(Request $request, $id)
+    {
+        try {
+            $cartService = new \App\Services\CartService();
+            $result = $cartService->getDetailedStockInfo($id);
+            
+            return response()->json($result);
+        } catch (\Exception $e) {
+            Log::error('Error getting detailed stock info', [
+                'product_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi lấy thông tin stock'
+            ], 500);
+        }
+    }
+
+    /**
+     * Lấy stock hiển thị cho cart (tính cả cart quantity)
+     */
+    public function getDisplayStock($id)
+    {
+        try {
+            $cartService = new \App\Services\CartService();
+            
+            // Lấy sản phẩm
+            $product = SanPham::with(['chitietsanpham'])->find($id);
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy sản phẩm'
+                ], 404);
+            }
+
+            // Tính stock hiển thị cho sản phẩm chính (không trừ cart)
+            $mainStock = $product->soLuong ?? 0;
+            
+            // Tính stock hiển thị cho variants (không trừ cart)
+            $variantStock = $product->chitietsanpham->sum('soLuong');
+            $variantDetails = [];
+            
+            foreach ($product->chitietsanpham as $variant) {
+                $variantDetails[] = [
+                    'id' => $variant->id,
+                    'stock' => $variant->soLuong ?? 0,
+                    'original_stock' => $variant->soLuong ?? 0
+                ];
+            }
+
+            $totalStock = $mainStock + $variantStock;
+            $totalRealStock = $totalStock;
+            $cartQuantity = 0; // Không tính cart quantity ở đây
+
+            Log::info('Display stock calculation:', [
+                'product_id' => $id,
+                'main_stock' => $mainStock,
+                'variant_stock' => $variantStock,
+                'total_stock' => $totalStock,
+                'total_real_stock' => $totalRealStock,
+                'cart_quantity' => $cartQuantity
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'product_id' => $id,
+                'mainStock' => $mainStock,
+                'variantStock' => $variantStock,
+                'totalStock' => $totalStock,
+                'totalRealStock' => $totalRealStock,
+                'cartQuantity' => $cartQuantity,
+                'variantDetails' => $variantDetails
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting display stock', [
+                'product_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi lấy thông tin stock hiển thị'
+            ], 500);
+        }
+    }
+
+    /**
+     * Lấy ảnh sản phẩm theo ID
+     */
+    public function getImages($id)
+    {
+        try {
+            $product = SanPham::with(['hinhanh'])->find($id);
+            
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy sản phẩm'
+                ], 404);
+            }
+
+            $images = $product->hinhanh->map(function ($image) {
+                return [
+                    'id' => $image->id,
+                    'url' => asset('storage/' . $image->url),
+                    'is_default' => $image->is_default,
+                    'mota' => $image->mota
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'product_id' => $id,
+                    'product_name' => $product->tenSP,
+                    'images' => $images,
+                    'total_images' => $images->count()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error getting product images: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi lấy ảnh sản phẩm'
+            ], 500);
         }
     }
 }

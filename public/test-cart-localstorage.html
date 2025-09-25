@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cart localStorage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Cart localStorage</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Cart Operations</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="createTestCart()">Create Test Cart</button>
+                        <button class="btn btn-success mb-2" onclick="testIncrease()">Test Increase</button>
+                        <button class="btn btn-warning mb-2" onclick="testDecrease()">Test Decrease</button>
+                        <button class="btn btn-danger mb-2" onclick="testRemove()">Test Remove</button>
+                        <button class="btn btn-info mb-2" onclick="testClear()">Test Clear All</button>
+                        
+                        <div id="test-results" class="mt-3">
+                            <p class="text-muted">Click buttons to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Cart</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="cart-display">
+                            <p class="text-muted">Cart data will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Cart Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/giohang" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Cart Page
+                        </a>
+                        
+                        <div class="alert alert-success">
+                            <h6>✅ localStorage Only Features:</h6>
+                            <ul class="mb-0">
+                                <li>✅ No server API calls</li>
+                                <li>✅ All operations use localStorage</li>
+                                <li>✅ Accurate cart count calculation</li>
+                                <li>✅ Product names fixed (no "undefined")</li>
+                                <li>✅ Stock management with localStorage</li>
+                                <li>✅ Duplicate removal and merging</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock cart operations
+        function createTestCart() {
+            const testCart = [
+                {
+                    product_id: 106,
+                    variant_id: 0,
+                    quantity: 5,
+                    name: 'Quần thun',
+                    price: 500000,
+                    image: '/backend/img/p1.jpg',
+                    color_name: null,
+                    size_name: null
+                },
+                {
+                    product_id: 106,
+                    variant_id: 136,
+                    quantity: 2,
+                    name: 'Quần thun',
+                    price: 22222,
+                    image: '/backend/img/p1.jpg',
+                    color_name: 'Đỏ',
+                    size_name: '38'
+                }
+            ];
+            
+            localStorage.setItem('cart_data', JSON.stringify(testCart));
+            updateCartDisplay();
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Test Cart Created:</h6>
+                    <p>2 items added to cart</p>
+                    <p>Total quantity: 7</p>
+                </div>
+            `;
+        }
+        
+        function testIncrease() {
+            const cartData = JSON.parse(localStorage.getItem('cart_data') || '[]');
+            if (cartData.length === 0) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Items:</h6>
+                        <p>Create test cart first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            cartData[0].quantity += 1;
+            localStorage.setItem('cart_data', JSON.stringify(cartData));
+            updateCartDisplay();
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>➕ Quantity Increased:</h6>
+                    <p>Item: ${cartData[0].name}</p>
+                    <p>New Quantity: ${cartData[0].quantity}</p>
+                </div>
+            `;
+        }
+        
+        function testDecrease() {
+            const cartData = JSON.parse(localStorage.getItem('cart_data') || '[]');
+            if (cartData.length === 0) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Items:</h6>
+                        <p>Create test cart first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (cartData[0].quantity > 1) {
+                cartData[0].quantity -= 1;
+                localStorage.setItem('cart_data', JSON.stringify(cartData));
+                updateCartDisplay();
+                
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>➖ Quantity Decreased:</h6>
+                        <p>Item: ${cartData[0].name}</p>
+                        <p>New Quantity: ${cartData[0].quantity}</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ Cannot Decrease:</h6>
+                        <p>Quantity is already at minimum (1)</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function testRemove() {
+            const cartData = JSON.parse(localStorage.getItem('cart_data') || '[]');
+            if (cartData.length === 0) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Items:</h6>
+                        <p>Create test cart first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const removedItem = cartData.shift();
+            localStorage.setItem('cart_data', JSON.stringify(cartData));
+            updateCartDisplay();
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-danger">
+                    <h6>🗑️ Item Removed:</h6>
+                    <p>Removed: ${removedItem.name}</p>
+                    <p>Remaining items: ${cartData.length}</p>
+                </div>
+            `;
+        }
+        
+        function testClear() {
+            localStorage.removeItem('cart_data');
+            updateCartDisplay();
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-danger">
+                    <h6>🗑️ Cart Cleared:</h6>
+                    <p>All items removed</p>
+                    <p>Cart is now empty</p>
+                </div>
+            `;
+        }
+        
+        function updateCartDisplay() {
+            const cartData = JSON.parse(localStorage.getItem('cart_data') || '[]');
+            const totalQuantity = cartData.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cartData.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            document.getElementById('cart-display').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Cart Summary:</h6>
+                    <p><strong>Items:</strong> ${cartData.length}</p>
+                    <p><strong>Total Quantity:</strong> ${totalQuantity}</p>
+                    <p><strong>Total Price:</strong> ${new Intl.NumberFormat('vi-VN').format(totalPrice)}₫</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${cartData.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>
+                                        <span class="badge ${item.variant_id ? 'bg-info' : 'bg-primary'}">
+                                            ${item.variant_id ? 'Biến thể' : 'Sản phẩm chính'}
+                                        </span>
+                                    </td>
+                                    <td>${new Intl.NumberFormat('vi-VN').format(item.price)}₫</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${new Intl.NumberFormat('vi-VN').format(item.price * item.quantity)}₫</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // Auto-update on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Cart localStorage test page loaded');
+            updateCartDisplay();
+        });
+    </script>
+</body>
+</html>

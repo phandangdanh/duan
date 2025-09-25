@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Stock Logic</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Stock Logic</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Stock Logic Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-3" onclick="testStockLogic()">Test Stock Logic</button>
+                        
+                        <div id="test-result" class="mt-3">
+                            <p class="text-muted">Click button to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Expected Behavior</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>📋 When Main Product Has Stock:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Colors:</strong> "Sản phẩm chính còn hàng"</li>
+                                <li><strong>Sizes:</strong> "Sản phẩm chính còn hàng"</li>
+                                <li><strong>Stock:</strong> Show main product stock</li>
+                                <li><strong>Add to Cart:</strong> Add main product</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h6>📋 When Main Product Out of Stock:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Colors:</strong> Show color options</li>
+                                <li><strong>Sizes:</strong> "Vui lòng chọn màu sắc trước"</li>
+                                <li><strong>Stock:</strong> Show variant stock</li>
+                                <li><strong>Add to Cart:</strong> Add variant</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Links</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-external-link-alt"></i> Product Detail Page
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="http://localhost:8000/api/products/106" target="_blank" class="btn btn-info btn-sm">
+                                    <i class="fas fa-external-link-alt"></i> API Response
+                                </a>
+                            </li>
+                        </ul>
+                        
+                        <div class="mt-3">
+                            <h6>Debug Steps:</h6>
+                            <ol>
+                                <li>Check API response for <code>soLuong</code> field</li>
+                                <li>If <code>soLuong > 0</code>: Should show "Sản phẩm chính còn hàng"</li>
+                                <li>If <code>soLuong = 0</code>: Should show color options</li>
+                                <li>Click color to see sizes</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testStockLogic() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<p class="text-info">Testing stock logic...</p>';
+            
+            try {
+                console.log('=== TESTING STOCK LOGIC ===');
+                
+                const response = await fetch('http://localhost:8000/api/products/106', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                const product = data.data;
+                const mainStock = product.soLuong || 0;
+                const variants = product.chitietsanpham || [];
+                
+                let expectedBehavior;
+                if (mainStock > 0) {
+                    expectedBehavior = `
+                        <div class="alert alert-success">
+                            <h6>✅ Main Product Has Stock (${mainStock})</h6>
+                            <p><strong>Expected:</strong></p>
+                            <ul class="mb-0">
+                                <li>Colors: "Sản phẩm chính còn hàng"</li>
+                                <li>Sizes: "Sản phẩm chính còn hàng"</li>
+                                <li>Stock: ${mainStock}</li>
+                                <li>Add to Cart: Main product</li>
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    expectedBehavior = `
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Main Product Out of Stock</h6>
+                            <p><strong>Expected:</strong></p>
+                            <ul class="mb-0">
+                                <li>Colors: Show ${variants.length} color options</li>
+                                <li>Sizes: "Vui lòng chọn màu sắc trước"</li>
+                                <li>Stock: Variant stock</li>
+                                <li>Add to Cart: Selected variant</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>📊 API Data Analysis</h6>
+                        <p><strong>Product:</strong> ${product.tenSP}</p>
+                        <p><strong>Main Stock:</strong> ${mainStock}</p>
+                        <p><strong>Variants:</strong> ${variants.length}</p>
+                        <p><strong>Base Price:</strong> ${product.base_price ? new Intl.NumberFormat('vi-VN').format(product.base_price) : 'N/A'} VNĐ</p>
+                        <p><strong>Sale Price:</strong> ${product.base_sale_price ? new Intl.NumberFormat('vi-VN').format(product.base_sale_price) : 'N/A'} VNĐ</p>
+                    </div>
+                    
+                    ${expectedBehavior}
+                    
+                    <div class="alert alert-light">
+                        <h6>🔍 Next Steps</h6>
+                        <p>1. Open the product detail page</p>
+                        <p>2. Check if colors and sizes show correctly</p>
+                        <p>3. Test add to cart functionality</p>
+                        <p>4. Check console logs for debugging info</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Test Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Test Error!</h6>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Possible causes:</strong></p>
+                        <ul>
+                            <li>Laravel server not running</li>
+                            <li>API endpoint not accessible</li>
+                            <li>Product ID 106 not found</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Stock logic test page loaded');
+        });
+    </script>
+</body>
+</html>

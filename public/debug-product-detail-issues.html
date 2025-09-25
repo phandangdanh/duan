@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Product Detail Issues</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Debug Product Detail Issues</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Issues</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <h6>❌ Issues Found:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Color/Size Options:</strong> Not rendering despite finding sections</li>
+                                <li><strong>Cart Count:</strong> 22 items (seems high)</li>
+                                <li><strong>File Structure:</strong> Moving files broke functionality</li>
+                                <li><strong>Data Flow:</strong> API data not reaching render functions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Debug Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="testAPI()">Test API Response</button>
+                        <button class="btn btn-warning mb-2" onclick="clearCart()">Clear Cart</button>
+                        <button class="btn btn-info mb-2" onclick="checkLocalStorage()">Check LocalStorage</button>
+                        
+                        <div id="debug-results" class="mt-3">
+                            <p class="text-muted">Click buttons to debug...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Product Detail Page
+                        </a>
+                        
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Check Console Logs:</h6>
+                            <pre class="bg-light p-3">
+Expected Logs:
+Product variants: [array of variants]
+Colors to render: [array of colors]
+Color options rendered
+Sizes to render: [array of sizes] (when color selected)
+Size options rendered
+
+If missing:
+- Check if this.product.chitietsanpham exists
+- Check if variants have mausac.ten and size.ten
+- Check if colorSection.innerHTML is being set
+                            </pre>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h6>📋 Debug Steps:</h6>
+                            <ol class="mb-0">
+                                <li>Open Product Detail Page</li>
+                                <li>Open Browser Console (F12)</li>
+                                <li>Look for "Product variants:" log</li>
+                                <li>Check if variants array has data</li>
+                                <li>Look for "Colors to render:" log</li>
+                                <li>Check if colors array is populated</li>
+                                <li>Look for "Color options rendered" log</li>
+                                <li>Verify color buttons appear on page</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Possible Solutions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <h6>✅ Quick Fixes:</h6>
+                                    <ul class="mb-0">
+                                        <li>Check API response structure</li>
+                                        <li>Verify variant data format</li>
+                                        <li>Ensure mausac.ten exists</li>
+                                        <li>Check size.ten exists</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-warning">
+                                    <h6>⚠️ File Structure:</h6>
+                                    <ul class="mb-0">
+                                        <li>Verify file paths are correct</li>
+                                        <li>Check if scripts load in order</li>
+                                        <li>Ensure no conflicts</li>
+                                        <li>Test with original file structure</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            try {
+                const response = await fetch('/api/products/106');
+                const data = await response.json();
+                
+                document.getElementById('debug-results').innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>📊 API Response:</h6>
+                        <pre class="mb-0">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('debug-results').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ API Error:</h6>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function clearCart() {
+            localStorage.removeItem('cart_data');
+            document.getElementById('debug-results').innerHTML = `
+                <div class="alert alert-warning">
+                    <h6>🗑️ Cart Cleared</h6>
+                    <p>All cart data removed from localStorage</p>
+                </div>
+            `;
+        }
+        
+        function checkLocalStorage() {
+            const cartData = localStorage.getItem('cart_data');
+            const stockData = localStorage.getItem('product_stock_106');
+            
+            document.getElementById('debug-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 LocalStorage Data:</h6>
+                    <p><strong>Cart Data:</strong></p>
+                    <pre>${cartData || 'No cart data'}</pre>
+                    <p><strong>Stock Data:</strong></p>
+                    <pre>${stockData || 'No stock data'}</pre>
+                </div>
+            `;
+        }
+        
+        // Auto-check on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLocalStorage();
+        });
+    </script>
+</body>
+</html>

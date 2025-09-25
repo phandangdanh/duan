@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Color Size Behavior</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Color Size Behavior</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>New Behavior Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-3" onclick="testBehavior()">Test New Behavior</button>
+                        
+                        <div id="test-result" class="mt-3">
+                            <p class="text-muted">Click button to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Expected Behavior</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6>✅ New Logic:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Màu sắc:</strong> Luôn hiển thị các màu có sẵn</li>
+                                <li><strong>Size:</strong> Chỉ hiện khi chọn màu sắc</li>
+                                <li><strong>Initial:</strong> Không tự động chọn màu</li>
+                                <li><strong>Price:</strong> Hiển thị giá chính khi chưa chọn variant</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Steps</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li>Mở trang product detail</li>
+                            <li>Kiểm tra màu sắc hiển thị</li>
+                            <li>Kiểm tra size hiển thị "Vui lòng chọn màu sắc trước"</li>
+                            <li>Click một màu sắc</li>
+                            <li>Kiểm tra size hiển thị các size tương ứng</li>
+                            <li>Click màu khác để test</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-info mb-3">
+                            <i class="fas fa-external-link-alt"></i> Open Product Detail Page
+                        </a>
+                        
+                        <div class="alert alert-info">
+                            <h6>📋 Expected Console Logs:</h6>
+                            <ul class="mb-0">
+                                <li>✅ "Main product stock: 10"</li>
+                                <li>✅ "selectedColor: null" (không tự chọn)</li>
+                                <li>✅ "selectedSize: null" (không tự chọn)</li>
+                                <li>✅ "Rendering size options for color: null"</li>
+                                <li>✅ Size hiển thị "Vui lòng chọn màu sắc trước"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testBehavior() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<p class="text-info">Testing new behavior...</p>';
+            
+            try {
+                console.log('=== TESTING NEW BEHAVIOR ===');
+                
+                const response = await fetch('http://localhost:8000/api/products/106', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const product = data.data;
+                const variants = product.chitietsanpham || [];
+                
+                // Get unique colors
+                const colors = [...new Set(variants.map(v => ({
+                    id: v.id_mausac,
+                    name: v.mausac.ten
+                })))].filter((color, index, self) => 
+                    index === self.findIndex(c => c.id === color.id)
+                );
+                
+                // Get unique sizes for first color
+                const firstColorSizes = [...new Set(variants
+                    .filter(v => v.id_mausac === colors[0]?.id)
+                    .map(v => ({ id: v.id_size, name: v.size.ten }))
+                )].filter((size, index, self) => 
+                    index === self.findIndex(s => s.id === size.id)
+                );
+                
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>✅ API Data Analysis</h6>
+                        <p><strong>Product:</strong> ${product.tenSP}</p>
+                        <p><strong>Main Stock:</strong> ${product.soLuong || 0}</p>
+                        <p><strong>Available Colors:</strong> ${colors.length}</p>
+                        <p><strong>Sizes for first color:</strong> ${firstColorSizes.length}</p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6>🎨 Available Colors:</h6>
+                        <ul class="mb-0">
+                            ${colors.map(color => `<li>${color.name} (ID: ${color.id})</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6>📏 Sizes for "${colors[0]?.name || 'First Color'}":</h6>
+                        <ul class="mb-0">
+                            ${firstColorSizes.map(size => `<li>${size.name} (ID: ${size.id})</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <h6>✅ Expected Behavior:</h6>
+                        <ul class="mb-0">
+                            <li><strong>Initial:</strong> Colors visible, Size shows "Vui lòng chọn màu sắc trước"</li>
+                            <li><strong>Click Color:</strong> Size options appear for that color</li>
+                            <li><strong>Click Another Color:</strong> Size options update</li>
+                            <li><strong>Price:</strong> Shows main product price initially</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Test Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Test Error!</h6>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Color size behavior test page loaded');
+        });
+    </script>
+</body>
+</html>

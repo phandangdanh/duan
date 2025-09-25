@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Product Detail Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Complete Product Detail Test</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Results & Debug Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Test Links:</h6>
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-external-link-alt"></i> Product Detail Page
+                                        </a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="http://localhost:8000/debug-product-detail.html" target="_blank" class="btn btn-info btn-sm">
+                                            <i class="fas fa-external-link-alt"></i> Debug Page
+                                        </a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="http://localhost:8000/simple-api-test.html" target="_blank" class="btn btn-success btn-sm">
+                                            <i class="fas fa-external-link-alt"></i> API Test
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h6>Expected Data Flow:</h6>
+                                <div class="alert alert-info">
+                                    <h6>📋 Data Loading Process:</h6>
+                                    <ol class="mb-0">
+                                        <li><strong>Page Load:</strong> Show "Đang tải..."</li>
+                                        <li><strong>API Call:</strong> GET /api/products/106</li>
+                                        <li><strong>Data Processing:</strong> Extract product data</li>
+                                        <li><strong>Render:</strong> Update title, price, description</li>
+                                        <li><strong>Images:</strong> Load thumbnails</li>
+                                        <li><strong>Variants:</strong> Load colors and sizes</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6>Debug Checklist:</h6>
+                            <div class="alert alert-warning">
+                                <h6>🔍 Check These Issues:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Server Running:</strong> <code>php artisan serve</code> on port 8000</li>
+                                    <li><strong>API Endpoint:</strong> <code>http://localhost:8000/api/products/106</code> returns data</li>
+                                    <li><strong>JavaScript Files:</strong> All JS files load without 404 errors</li>
+                                    <li><strong>Console Logs:</strong> No JavaScript errors in browser console</li>
+                                    <li><strong>Element IDs:</strong> HTML elements have correct IDs</li>
+                                    <li><strong>Data Format:</strong> API returns expected JSON structure</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6>Common Issues & Solutions:</h6>
+                            <div class="alert alert-danger">
+                                <h6>❌ If Product Not Loading:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>404 on JS files:</strong> Check file paths in public/fontend/js/</li>
+                                    <li><strong>API 404:</strong> Check routes/api.php has product routes</li>
+                                    <li><strong>CORS errors:</strong> Check Laravel CORS configuration</li>
+                                    <li><strong>JavaScript errors:</strong> Check browser console for errors</li>
+                                    <li><strong>Element not found:</strong> Check HTML has correct IDs</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

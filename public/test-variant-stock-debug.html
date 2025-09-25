@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Variant Stock Issue</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Debug Variant Stock Issue</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Issue</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <h6>❌ Problem:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Variant Stock = 0:</strong> "Số lượng có sẵn: 0"</li>
+                                <li><strong>All Sizes Error:</strong> Thêm bất kỳ size nào đều thông báo lỗi</li>
+                                <li><strong>Stock Not Loaded:</strong> Variant stock không được load từ localStorage</li>
+                                <li><strong>Data Mismatch:</strong> Variant data có thể không đúng format</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Debug Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="testVariantStock()">Test Variant Stock</button>
+                        <button class="btn btn-success mb-2" onclick="simulateVariantSelection()">Simulate Selection</button>
+                        <button class="btn btn-warning mb-2" onclick="checkStockData()">Check Stock Data</button>
+                        <button class="btn btn-info mb-2" onclick="createTestStock()">Create Test Stock</button>
+                        <button class="btn btn-danger mb-2" onclick="clearStock()">Clear Stock</button>
+                        
+                        <div id="debug-results" class="mt-3">
+                            <p class="text-muted">Click buttons to debug...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Expected Console Logs</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>📋 When Selecting Variant:</h6>
+                            <pre class="bg-light p-3">
+🎨 selectColor called: {colorId: 1, colorName: "Đỏ"}
+🎨 Selecting new color: Đỏ
+🎨 Selected color after update: 1
+📏 renderSizeOptions called
+📏 Size options rendered
+🔍 getSelectedVariant called
+🔍 Selected color: 1
+🔍 Selected size: 1
+🔍 Found variant: {id: 1, id_mausac: 1, id_size: 1, soLuong: 5, ...}
+📦 getCurrentStock called
+📦 Selected variant: {id: 1, id_mausac: 1, id_size: 1, soLuong: 5, ...}
+📦 Stock data: {mainStock: 0, variants: {variant_1: 5, variant_2: 3}}
+📦 Variant stock calculation:
+📦   - Variant key: variant_1
+📦   - Stock from localStorage: 5
+📦   - Stock from variant.soLuong: 5
+📦   - Final stock: 5
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Product Detail Page
+                        </a>
+                        
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Debug Steps:</h6>
+                            <ol class="mb-0">
+                                <li><strong>Step 1:</strong> Open Product Detail Page</li>
+                                <li><strong>Step 2:</strong> Select color "Đỏ" (should be auto-selected)</li>
+                                <li><strong>Step 3:</strong> Select size "38"</li>
+                                <li><strong>Step 4:</strong> Check console for variant stock logs</li>
+                                <li><strong>Step 5:</strong> Check "Số lượng có sẵn" display</li>
+                                <li><strong>Step 6:</strong> Try adding to cart</li>
+                                <li><strong>Step 7:</strong> Check error message</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock product data
+        const mockProduct = {
+            id: 106,
+            soLuong: 0, // Main product out of stock
+            chitietsanpham: [
+                { id: 1, id_mausac: 1, id_size: 1, soLuong: 5, mausac: { ten: 'Đỏ' }, size: { ten: '38' } },
+                { id: 2, id_mausac: 1, id_size: 2, soLuong: 3, mausac: { ten: 'Đỏ' }, size: { ten: '39' } },
+                { id: 3, id_mausac: 1, id_size: 3, soLuong: 4, mausac: { ten: 'Đỏ' }, size: { ten: '40' } },
+                { id: 4, id_mausac: 2, id_size: 1, soLuong: 2, mausac: { ten: 'Vàng' }, size: { ten: '38' } },
+                { id: 5, id_mausac: 2, id_size: 2, soLuong: 1, mausac: { ten: 'Vàng' }, size: { ten: '39' } }
+            ]
+        };
+        
+        let selectedColor = 1; // Auto-selected
+        let selectedSize = 1; // User selected
+        
+        function getLocalStock() {
+            const storageKey = 'product_stock_106';
+            const stored = localStorage.getItem(storageKey);
+            
+            if (stored) {
+                console.log('📦 Found stored stock data:', JSON.parse(stored));
+                return JSON.parse(stored);
+            }
+            
+            // Create initial stock data if not found
+            const initialStock = {
+                mainStock: mockProduct.soLuong || 0,
+                variants: {}
+            };
+            
+            console.log('📦 Creating initial stock data:', initialStock);
+            localStorage.setItem(storageKey, JSON.stringify(initialStock));
+            
+            return initialStock;
+        }
+        
+        function getSelectedVariant() {
+            console.log('🔍 getSelectedVariant called');
+            console.log('🔍 Selected color:', selectedColor);
+            console.log('🔍 Selected size:', selectedSize);
+            
+            if (!selectedColor || !selectedSize || !mockProduct.chitietsanpham) {
+                console.log('🔍 No variant selected (missing color, size, or variants)');
+                return null;
+            }
+            
+            const variant = mockProduct.chitietsanpham.find(v => 
+                v.id_mausac === selectedColor && v.id_size === selectedSize
+            );
+            
+            console.log('🔍 Found variant:', variant);
+            return variant;
+        }
+        
+        function getCurrentStock() {
+            console.log('📦 getCurrentStock called');
+            const variant = getSelectedVariant();
+            const stockData = getLocalStock();
+            
+            console.log('📦 Selected variant:', variant);
+            console.log('📦 Stock data:', stockData);
+            
+            if (variant) {
+                // Return variant stock
+                const variantKey = `variant_${variant.id}`;
+                const variantStock = stockData.variants?.[variantKey] || variant.soLuong || 0;
+                console.log(`📦 Variant stock calculation:`);
+                console.log(`📦   - Variant key: ${variantKey}`);
+                console.log(`📦   - Stock from localStorage: ${stockData.variants?.[variantKey]}`);
+                console.log(`📦   - Stock from variant.soLuong: ${variant.soLuong}`);
+                console.log(`📦   - Final stock: ${variantStock}`);
+                return variantStock;
+            } else {
+                // Return main product stock
+                const mainStock = stockData.mainStock || mockProduct.soLuong || 0;
+                console.log('📦 Main product stock:', mainStock);
+                return mainStock;
+            }
+        }
+        
+        function testVariantStock() {
+            console.log('🧪 Testing variant stock...');
+            
+            const variant = getSelectedVariant();
+            const currentStock = getCurrentStock();
+            
+            document.getElementById('debug-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📦 Variant Stock Test:</h6>
+                    <p>Selected Variant: ${variant ? `ID ${variant.id}, ${variant.mausac.ten} - ${variant.size.ten}` : 'None'}</p>
+                    <p>Current Stock: ${currentStock}</p>
+                    <p>Stock Source: ${stockData.variants?.[`variant_${variant?.id}`] ? 'localStorage' : 'original'}</p>
+                    <p>Check console for detailed logs</p>
+                </div>
+            `;
+        }
+        
+        function simulateVariantSelection() {
+            console.log('🧪 Simulating variant selection...');
+            
+            // Simulate selecting size 38
+            selectedSize = 1;
+            
+            const variant = getSelectedVariant();
+            const currentStock = getCurrentStock();
+            
+            document.getElementById('debug-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>🎯 Variant Selection Simulation:</h6>
+                    <p>Color: ${selectedColor} (Đỏ)</p>
+                    <p>Size: ${selectedSize} (38)</p>
+                    <p>Variant: ${variant ? `ID ${variant.id}` : 'None'}</p>
+                    <p>Stock: ${currentStock}</p>
+                    <p>Check console for detailed logs</p>
+                </div>
+            `;
+        }
+        
+        function checkStockData() {
+            const stockData = getLocalStock();
+            
+            document.getElementById('debug-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Stock Data:</h6>
+                    <pre>${JSON.stringify(stockData, null, 2)}</pre>
+                </div>
+            `;
+        }
+        
+        function createTestStock() {
+            console.log('🧪 Creating test stock data...');
+            
+            const testStockData = {
+                mainStock: 0,
+                variants: {
+                    variant_1: 5, // Đỏ - 38
+                    variant_2: 3, // Đỏ - 39
+                    variant_3: 4, // Đỏ - 40
+                    variant_4: 2, // Vàng - 38
+                    variant_5: 1  // Vàng - 39
+                }
+            };
+            
+            localStorage.setItem('product_stock_106', JSON.stringify(testStockData));
+            
+            document.getElementById('debug-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Test Stock Created:</h6>
+                    <pre>${JSON.stringify(testStockData, null, 2)}</pre>
+                </div>
+            `;
+        }
+        
+        function clearStock() {
+            localStorage.removeItem('product_stock_106');
+            
+            document.getElementById('debug-results').innerHTML = `
+                <div class="alert alert-warning">
+                    <h6>🗑️ Stock Cleared</h6>
+                    <p>Stock data removed from localStorage</p>
+                </div>
+            `;
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Variant stock debug page loaded');
+            checkStockData();
+        });
+    </script>
+</body>
+</html>

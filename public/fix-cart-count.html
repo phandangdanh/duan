@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Cart Count Issue</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Fix Cart Count Issue</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Cart Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-3" onclick="checkCartData()">Check Cart Data</button>
+                        <button class="btn btn-warning mb-3" onclick="clearCartData()">Clear Cart Data</button>
+                        <button class="btn btn-success mb-3" onclick="fixCartCount()">Fix Cart Count</button>
+                        
+                        <div id="cart-info" class="mt-3">
+                            <p class="text-muted">Click button to check...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Cart Count Debug</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>🔍 Issue:</h6>
+                            <p>Header shows "24" items but cart page shows "Empty cart"</p>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h6>💡 Solution:</h6>
+                            <p>Cart count now loads from localStorage instead of server API</p>
+                        </div>
+                        
+                        <div class="alert alert-success">
+                            <h6>✅ Expected:</h6>
+                            <p>Cart count in header should match localStorage data</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Pages</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/cart" target="_blank" class="btn btn-info mb-3">
+                            <i class="fas fa-external-link-alt"></i> Open Cart Page
+                        </a>
+                        
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-external-link-alt"></i> Open Product Detail
+                        </a>
+                        
+                        <div class="alert alert-info">
+                            <h6>📋 Test Steps:</h6>
+                            <ol class="mb-0">
+                                <li>Click "Check Cart Data" to see current localStorage</li>
+                                <li>Click "Clear Cart Data" to remove all items</li>
+                                <li>Click "Fix Cart Count" to update header count</li>
+                                <li>Open Cart Page to verify it shows correct data</li>
+                                <li>Add items from Product Detail page</li>
+                                <li>Check if header count updates correctly</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkCartData() {
+            const cartData = localStorage.getItem('cart_data');
+            let cartItems = [];
+            let totalItems = 0;
+            
+            if (cartData) {
+                try {
+                    cartItems = JSON.parse(cartData);
+                    totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                } catch (error) {
+                    console.error('Error parsing cart data:', error);
+                }
+            }
+            
+            document.getElementById('cart-info').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Cart Data Analysis</h6>
+                    <p><strong>Total Items:</strong> ${totalItems}</p>
+                    <p><strong>Unique Products:</strong> ${cartItems.length}</p>
+                    <p><strong>Raw Data:</strong></p>
+                    <pre class="mb-0">${JSON.stringify(cartItems, null, 2)}</pre>
+                </div>
+            `;
+        }
+        
+        function clearCartData() {
+            localStorage.removeItem('cart_data');
+            
+            document.getElementById('cart-info').innerHTML = `
+                <div class="alert alert-warning">
+                    <h6>🗑️ Cart Data Cleared</h6>
+                    <p>All cart data has been removed from localStorage</p>
+                </div>
+            `;
+            
+            // Update cart count
+            updateCartCount();
+        }
+        
+        function fixCartCount() {
+            updateCartCount();
+            
+            document.getElementById('cart-info').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Cart Count Fixed</h6>
+                    <p>Header cart count has been updated from localStorage</p>
+                </div>
+            `;
+        }
+        
+        // Function to update cart count (same as in app.blade.php)
+        function updateCartCount() {
+            try {
+                const cartData = localStorage.getItem('cart_data');
+                let cartCount = 0;
+                
+                if (cartData) {
+                    const cartItems = JSON.parse(cartData);
+                    cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                }
+                
+                const cartCountElement = document.querySelector('.cart-count');
+                if (cartCountElement) {
+                    cartCountElement.textContent = cartCount;
+                    if (cartCount === 0) {
+                        cartCountElement.style.display = 'none';
+                    } else {
+                        cartCountElement.style.display = 'inline-block';
+                    }
+                }
+                
+                console.log('Cart count updated from localStorage:', cartCount);
+            } catch (error) {
+                console.error('Error updating cart count from localStorage:', error);
+            }
+        }
+        
+        // Auto-check on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkCartData();
+        });
+    </script>
+</body>
+</html>

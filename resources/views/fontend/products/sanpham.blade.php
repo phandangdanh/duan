@@ -125,20 +125,165 @@
     }
     
     .btn-view-detail {
-      background: #ffc107;
-      color: #212529;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
       border: none;
-      border-radius: 25px;
-      padding: 10px 20px;
-      font-weight: 600;
-      transition: all 0.3s ease;
+      border-radius: 50px;
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       width: 100%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      text-transform: uppercase;
     }
     
     .btn-view-detail:hover {
-      background: #e0a800;
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+      color: white;
+    }
+    
+    .btn-view-detail:active {
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-view-detail::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.6s ease;
+    }
+    
+    .btn-view-detail:hover::before {
+      left: 100%;
+    }
+    
+    .btn-buy-now {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      min-width: 130px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+      text-transform: uppercase;
+    }
+    
+    .btn-buy-now:hover {
+      background: linear-gradient(135deg, #ee5a24 0%, #ff6b6b 100%);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(255, 107, 107, 0.5);
+    }
+    
+    .btn-buy-now:active {
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    }
+    
+    .btn-buy-now::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.6s ease;
+    }
+    
+    .btn-buy-now:hover::before {
+      left: 100%;
+    }
+    
+    /* Thêm hiệu ứng pulse cho nút Mua ngay */
+    .btn-buy-now::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn-buy-now:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+    
+    /* Cải thiện card sản phẩm */
+    .product-card {
+      transition: all 0.3s ease;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    
+    .product-card:hover .btn-view-detail,
+    .product-card:hover .btn-buy-now {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+    
+    /* Thêm hiệu ứng loading cho nút */
+    .btn-buy-now.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    
+    .btn-buy-now.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    
+    /* Responsive cho mobile */
+    @media (max-width: 768px) {
+      .btn-view-detail,
+      .btn-buy-now {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+      
+      .btn-buy-now {
+        min-width: 110px;
+      }
     }
     
     .empty-state {
@@ -360,11 +505,13 @@
                   </div>
                   
                   <div class="mt-auto">
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-3 align-items-center">
                       <a href="{{ route('product.detail', $product->id) }}" class="btn btn-view-detail flex-fill">
                         <i class="fas fa-eye me-2"></i>Xem chi tiết
                       </a>
-                      <button class="btn btn-danger" onclick="addToCart({{ $product->id }})">Mua ngay</button>
+                      <button class="btn btn-buy-now" onclick="buyNowFromHomepage({{ $product->id }})">
+                        <i class="fas fa-shopping-cart me-2"></i>Mua ngay
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -404,6 +551,25 @@
 
 @section('js')
 <script>
+// Enhanced buy now functionality with loading effect
+function buyNowFromHomepage(productId) {
+  const button = event.target.closest('.btn-buy-now');
+  const originalText = button.innerHTML;
+  
+  // Add loading state
+  button.classList.add('loading');
+  button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+  
+  // Call the original function
+  window.buyNowFromHomepage(productId)
+    .catch(error => {
+      console.error('Buy now error:', error);
+      // Reset button on error
+      button.classList.remove('loading');
+      button.innerHTML = originalText;
+    });
+}
+
 // Filter and Search functionality
 document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('product-search');

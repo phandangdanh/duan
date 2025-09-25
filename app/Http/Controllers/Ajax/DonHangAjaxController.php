@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Ajax;
 use App\Http\Controllers\Controller;
 use App\Models\DonHang;
 use App\Models\ChiTietDonHang;
+use App\Models\DonHangVoucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
@@ -116,35 +117,103 @@ class DonHangAjaxController extends Controller
     public function destroy(Request $request)
     {
         try {
-            $request->validate([
-                'id' => 'required|integer|exists:donhang,id'
+            Log::info('DonHangAjaxController::destroy called', [
+                'request_data' => $request->all(),
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name ?? 'Unknown'
             ]);
 
-            $donhang = DonHang::findOrFail($request->id);
-            
-            // Kiểm tra quyền xóa
-            if ($donhang->trangthai !== DonHang::TRANGTHAI_DA_HUY) {
+            // Kiểm tra nếu có ids (xóa hàng loạt) hoặc id (xóa đơn lẻ)
+            if ($request->has('ids')) {
+                // Xóa hàng loạt
+                $request->validate([
+                    'ids' => 'required|array',
+                    'ids.*' => 'integer|exists:donhang,id'
+                ]);
+
+                $deletedCount = 0;
+                $errors = [];
+
+                foreach ($request->ids as $id) {
+                    try {
+                        $donhang = DonHang::findOrFail($id);
+                        
+                        // Kiểm tra quyền xóa
+                        if ($donhang->trangthai !== DonHang::TRANGTHAI_DA_HUY) {
+                            $errors[] = "Đơn hàng #{$id}: Chỉ có thể xóa đơn hàng đã hủy";
+                            continue;
+                        }
+
+                        // Xóa các bản ghi liên quan trước
+                        ChiTietDonHang::where('id_donhang', $id)->delete();
+                        DonHangVoucher::where('id_donhang', $id)->delete();
+                        
+                        // Xóa đơn hàng
+                        $donhang->delete();
+                        $deletedCount++;
+                    } catch (\Exception $e) {
+                        $errors[] = "Đơn hàng #{$id}: " . $e->getMessage();
+                    }
+                }
+
+                if ($deletedCount > 0) {
+                    $message = "Đã xóa thành công {$deletedCount} đơn hàng";
+                    if (!empty($errors)) {
+                        $message .= ". Có " . count($errors) . " đơn hàng gặp lỗi.";
+                    }
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => $message,
+                        'data' => [
+                            'deleted_count' => $deletedCount,
+                            'errors' => $errors
+                        ]
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Không thể xóa đơn hàng nào. ' . implode('; ', $errors)
+                    ], 400);
+                }
+            } else {
+                // Xóa đơn lẻ
+                $request->validate([
+                    'id' => 'required|integer|exists:donhang,id'
+                ]);
+
+                $donhang = DonHang::findOrFail($request->id);
+                
+                // Kiểm tra quyền xóa
+                if ($donhang->trangthai !== DonHang::TRANGTHAI_DA_HUY) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Chỉ có thể xóa đơn hàng đã hủy'
+                    ], 400);
+                }
+
+                // Xóa các bản ghi liên quan trước
+                ChiTietDonHang::where('id_donhang', $request->id)->delete();
+                DonHangVoucher::where('id_donhang', $request->id)->delete();
+                
+                // Xóa đơn hàng
+                $donhang->delete();
+
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Chỉ có thể xóa đơn hàng đã hủy'
-                ], 400);
+                    'success' => true,
+                    'message' => 'Xóa đơn hàng thành công'
+                ]);
             }
-
-            // Xóa chi tiết đơn hàng trước
-            ChiTietDonHang::where('id_donhang', $request->id)->delete();
-            
-            // Xóa đơn hàng
-            $donhang->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Xóa đơn hàng thành công'
-            ]);
         } catch (\Exception $e) {
-            Log::error('Lỗi khi xóa đơn hàng: ' . $e->getMessage());
+            Log::error('Lỗi khi xóa đơn hàng: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => auth()->id()
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Có lỗi xảy ra khi xóa đơn hàng'
+                'message' => 'Có lỗi xảy ra khi xóa đơn hàng: ' . $e->getMessage()
             ], 500);
         }
     }

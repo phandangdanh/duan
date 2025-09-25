@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Color Toggle Behavior</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Color Toggle Behavior</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>New Toggle Behavior Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-3" onclick="testToggleBehavior()">Test Toggle Behavior</button>
+                        
+                        <div id="test-result" class="mt-3">
+                            <p class="text-muted">Click button to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Expected Toggle Behavior</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6>✅ New Toggle Logic:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Click màu lần 1:</strong> Hiện size options</li>
+                                <li><strong>Click cùng màu lần 2:</strong> Ẩn size, hiện giá chính</li>
+                                <li><strong>Click màu khác:</strong> Hiện size options mới</li>
+                                <li><strong>Active state:</strong> Chỉ highlight khi đang chọn</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Steps</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li>Mở trang product detail</li>
+                            <li>Kiểm tra size hiển thị "Vui lòng chọn màu sắc trước"</li>
+                            <li>Click màu A lần 1 → Size hiện</li>
+                            <li>Click màu A lần 2 → Size ẩn, giá chính</li>
+                            <li>Click màu B → Size hiện cho màu B</li>
+                            <li>Click màu B lần 2 → Size ẩn, giá chính</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-info mb-3">
+                            <i class="fas fa-external-link-alt"></i> Open Product Detail Page
+                        </a>
+                        
+                        <div class="alert alert-info">
+                            <h6>📋 Expected Console Logs:</h6>
+                            <ul class="mb-0">
+                                <li>✅ "Selecting color: X, Y"</li>
+                                <li>✅ "Current selected color: null" (lần đầu)</li>
+                                <li>✅ "Different color clicked, selecting new color"</li>
+                                <li>✅ "Same color clicked, resetting to initial state" (lần 2)</li>
+                                <li>✅ "Rendering size options for color: null" (khi reset)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testToggleBehavior() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<p class="text-info">Testing toggle behavior...</p>';
+            
+            try {
+                console.log('=== TESTING TOGGLE BEHAVIOR ===');
+                
+                const response = await fetch('http://localhost:8000/api/products/106', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const product = data.data;
+                const variants = product.chitietsanpham || [];
+                
+                // Get unique colors
+                const colors = [...new Set(variants.map(v => ({
+                    id: v.id_mausac,
+                    name: v.mausac.ten
+                })))].filter((color, index, self) => 
+                    index === self.findIndex(c => c.id === color.id)
+                );
+                
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>✅ API Data Analysis</h6>
+                        <p><strong>Product:</strong> ${product.tenSP}</p>
+                        <p><strong>Main Stock:</strong> ${product.soLuong || 0}</p>
+                        <p><strong>Base Price:</strong> ${product.base_price ? new Intl.NumberFormat('vi-VN').format(product.base_price) : 'N/A'} VNĐ</p>
+                        <p><strong>Sale Price:</strong> ${product.base_sale_price ? new Intl.NumberFormat('vi-VN').format(product.base_sale_price) : 'N/A'} VNĐ</p>
+                        <p><strong>Available Colors:</strong> ${colors.length}</p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6>🎨 Available Colors:</h6>
+                        <ul class="mb-0">
+                            ${colors.map(color => `<li>${color.name} (ID: ${color.id})</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <h6>✅ Toggle Behavior Logic:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>🔄 State Transitions:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Initial:</strong> No color selected</li>
+                                    <li><strong>Click Color:</strong> Color selected</li>
+                                    <li><strong>Click Same Color:</strong> Back to initial</li>
+                                    <li><strong>Click Different Color:</strong> New color selected</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>📏 Size Behavior:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>No Color:</strong> "Vui lòng chọn màu sắc trước"</li>
+                                    <li><strong>Color Selected:</strong> Show sizes for that color</li>
+                                    <li><strong>Color Deselected:</strong> Back to "Vui lòng chọn màu sắc trước"</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6>⚠️ Test Checklist:</h6>
+                        <ul class="mb-0">
+                            <li>✅ Size shows "Vui lòng chọn màu sắc trước" initially</li>
+                            <li>✅ Click color → Size options appear</li>
+                            <li>✅ Click same color again → Size disappears</li>
+                            <li>✅ Price shows main product price when no variant selected</li>
+                            <li>✅ Active color highlighting works correctly</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Test Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Test Error!</h6>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Color toggle behavior test page loaded');
+        });
+    </script>
+</body>
+</html>

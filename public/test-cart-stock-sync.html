@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cart Stock Sync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Cart Stock Sync</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Cart Features</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6>✅ Cart với localStorage:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Stock Validation:</strong> Kiểm tra stock trước khi update quantity</li>
+                                <li><strong>Quantity Controls:</strong> Tăng/giảm số lượng với validation</li>
+                                <li><strong>Stock Sync:</strong> Sync stock với trang chi tiết sản phẩm</li>
+                                <li><strong>No Server API:</strong> Hoạt động hoàn toàn với localStorage</li>
+                                <li><strong>Accurate Count:</strong> Cart count chính xác</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="createTestData()">Create Test Data</button>
+                        <button class="btn btn-success mb-2" onclick="testStockValidation()">Test Stock Validation</button>
+                        <button class="btn btn-warning mb-2" onclick="testQuantityUpdate()">Test Quantity Update</button>
+                        <button class="btn btn-info mb-2" onclick="showStockData()">Show Stock Data</button>
+                        
+                        <div id="test-results" class="mt-3">
+                            <p class="text-muted">Click buttons to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Cart Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="cart-display">
+                            <p class="text-muted">Cart data will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Stock Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="stock-display">
+                            <p class="text-muted">Stock data will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Cart Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/giohang" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Cart Page
+                        </a>
+                        
+                        <div class="alert alert-info">
+                            <h6>🔍 Expected Results:</h6>
+                            <ul class="mb-0">
+                                <li>✅ <strong>Stock Validation:</strong> Không thể tăng quantity vượt quá stock</li>
+                                <li>✅ <strong>Quantity Controls:</strong> +/- buttons hoạt động với validation</li>
+                                <li>✅ <strong>Input Validation:</strong> Quantity input có validation</li>
+                                <li>✅ <strong>Stock Sync:</strong> Stock được sync giữa cart và product detail</li>
+                                <li>✅ <strong>Cart Count:</strong> Cart count chính xác (không bị duplicate)</li>
+                                <li>✅ <strong>No API Errors:</strong> Không có lỗi server API</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createTestData() {
+            // Create test cart data
+            const testCart = [
+                {
+                    product_id: 106,
+                    variant_id: 0,
+                    quantity: 5,
+                    name: 'Quần thun',
+                    price: 500000,
+                    image: '/backend/img/p1.jpg',
+                    color_name: null,
+                    size_name: null
+                },
+                {
+                    product_id: 106,
+                    variant_id: 136,
+                    quantity: 2,
+                    name: 'Quần thun',
+                    price: 22222,
+                    image: '/backend/img/p1.jpg',
+                    color_name: 'Đỏ',
+                    size_name: '38'
+                }
+            ];
+            
+            // Create test stock data
+            const testStock = {
+                mainStock: 10,
+                variants: {
+                    variant_136: 8,
+                    variant_137: 5,
+                    variant_138: 3,
+                    variant_139: 7,
+                    variant_140: 4
+                }
+            };
+            
+            localStorage.setItem('cart_data', JSON.stringify(testCart));
+            localStorage.setItem('product_stock_106', JSON.stringify(testStock));
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Test Data Created:</h6>
+                    <p>Cart: 2 items (5 + 2 = 7 total)</p>
+                    <p>Stock: Main=10, Variants=27</p>
+                </div>
+            `;
+            
+            displayCartData();
+            displayStockData();
+        }
+        
+        function testStockValidation() {
+            const cartData = localStorage.getItem('cart_data');
+            const stockData = localStorage.getItem('product_stock_106');
+            
+            if (!cartData || !stockData) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Test Data:</h6>
+                        <p>Create test data first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const cart = JSON.parse(cartData);
+            const stock = JSON.parse(stockData);
+            
+            // Test stock validation
+            const mainItem = cart.find(item => item.variant_id === 0);
+            const variantItem = cart.find(item => item.variant_id === 136);
+            
+            let results = [];
+            
+            if (mainItem) {
+                const availableStock = stock.mainStock;
+                const requestedQuantity = mainItem.quantity + 10; // Try to add 10 more
+                
+                if (requestedQuantity > availableStock) {
+                    results.push(`✅ Main product validation: Cannot add ${requestedQuantity} (only ${availableStock} available)`);
+                } else {
+                    results.push(`❌ Main product validation: Should not allow ${requestedQuantity}`);
+                }
+            }
+            
+            if (variantItem) {
+                const availableStock = stock.variants.variant_136;
+                const requestedQuantity = variantItem.quantity + 10; // Try to add 10 more
+                
+                if (requestedQuantity > availableStock) {
+                    results.push(`✅ Variant validation: Cannot add ${requestedQuantity} (only ${availableStock} available)`);
+                } else {
+                    results.push(`❌ Variant validation: Should not allow ${requestedQuantity}`);
+                }
+            }
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>🔍 Stock Validation Test:</h6>
+                    <ul class="mb-0">
+                        ${results.map(result => `<li>${result}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        function testQuantityUpdate() {
+            const cartData = localStorage.getItem('cart_data');
+            
+            if (!cartData) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Test Data:</h6>
+                        <p>Create test data first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const cart = JSON.parse(cartData);
+            const mainItem = cart.find(item => item.variant_id === 0);
+            
+            if (mainItem) {
+                // Test quantity update
+                mainItem.quantity = 8; // Update quantity
+                localStorage.setItem('cart_data', JSON.stringify(cart));
+                
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>✅ Quantity Update Test:</h6>
+                        <p>Updated main product quantity: 5 → 8</p>
+                        <p>Cart count should update accordingly</p>
+                    </div>
+                `;
+                
+                displayCartData();
+            }
+        }
+        
+        function showStockData() {
+            const stockData = localStorage.getItem('product_stock_106');
+            
+            if (!stockData) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Stock Data:</h6>
+                        <p>Create test data first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const stock = JSON.parse(stockData);
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Stock Data:</h6>
+                    <p><strong>Main Stock:</strong> ${stock.mainStock}</p>
+                    <p><strong>Variants:</strong></p>
+                    <ul class="mb-0">
+                        ${Object.entries(stock.variants).map(([key, value]) => 
+                            `<li>${key}: ${value}</li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            displayStockData();
+        }
+        
+        function displayCartData() {
+            const cartData = localStorage.getItem('cart_data');
+            let cartItems = [];
+            
+            if (cartData) {
+                try {
+                    cartItems = JSON.parse(cartData);
+                } catch (error) {
+                    console.error('Error parsing cart data:', error);
+                }
+            }
+            
+            if (cartItems.length === 0) {
+                document.getElementById('cart-display').innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>📭 Empty Cart</h6>
+                        <p>No items in cart</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            document.getElementById('cart-display').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Cart Summary:</h6>
+                    <p><strong>Total Items:</strong> ${cartItems.length}</p>
+                    <p><strong>Total Quantity:</strong> ${totalQuantity}</p>
+                    <p><strong>Total Price:</strong> ${new Intl.NumberFormat('vi-VN').format(totalPrice)}₫</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${cartItems.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>
+                                        <span class="badge ${item.variant_id ? 'bg-info' : 'bg-primary'}">
+                                            ${item.variant_id ? 'Biến thể' : 'Sản phẩm chính'}
+                                        </span>
+                                    </td>
+                                    <td>${new Intl.NumberFormat('vi-VN').format(item.price)}₫</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${new Intl.NumberFormat('vi-VN').format(item.price * item.quantity)}₫</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function displayStockData() {
+            const stockData = localStorage.getItem('product_stock_106');
+            
+            if (!stockData) {
+                document.getElementById('stock-display').innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>📭 No Stock Data</h6>
+                        <p>No stock data available</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const stock = JSON.parse(stockData);
+            const totalVariantStock = Object.values(stock.variants || {}).reduce((sum, value) => sum + value, 0);
+            
+            document.getElementById('stock-display').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Stock Summary:</h6>
+                    <p><strong>Main Stock:</strong> ${stock.mainStock}</p>
+                    <p><strong>Total Variant Stock:</strong> ${totalVariantStock}</p>
+                    <p><strong>Total Available:</strong> ${stock.mainStock + totalVariantStock}</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Variant</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Main Product</td>
+                                <td>${stock.mainStock}</td>
+                            </tr>
+                            ${Object.entries(stock.variants || {}).map(([key, value]) => `
+                                <tr>
+                                    <td>${key}</td>
+                                    <td>${value}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // Auto-load on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Cart stock sync test page loaded');
+            displayCartData();
+            displayStockData();
+        });
+    </script>
+</body>
+</html>

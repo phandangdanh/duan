@@ -1,0 +1,184 @@
+/* Product Detail CSS */
+
+/* Size hidden class */
+.size-hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Đảm bảo size options ẩn hoàn toàn */
+#product-detail-size-options.size-hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Đảm bảo size options hiển thị khi không có class size-hidden */
+#product-detail-size-options:not(.size-hidden) {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 0.5rem !important;
+  margin: 0 !important;
+}
+
+/* Sửa background màu cho size options - mặc định nền trắng */
+#product-detail-size-options .variant-option {
+  background-color: white !important;
+  border: 1px solid #dee2e6 !important;
+  color: #495057 !important;
+  transition: all 0.3s ease !important;
+}
+
+#product-detail-size-options .variant-option:hover {
+  background-color: #f8f9fa !important;
+  border-color: #adb5bd !important;
+  color: #495057 !important;
+}
+
+/* Size active mặc định - nền xám */
+#product-detail-size-options .variant-option.active {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  color: white !important;
+}
+
+/* Khi màu đỏ được chọn, size có nền đỏ */
+.color-red-selected #product-detail-size-options .variant-option {
+  background-color: white !important;
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+.color-red-selected #product-detail-size-options .variant-option:hover {
+  background-color: #f8f9fa !important;
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+.color-red-selected #product-detail-size-options .variant-option.active {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+/* Khi màu vàng được chọn, size có nền vàng */
+.color-yellow-selected #product-detail-size-options .variant-option {
+  background-color: white !important;
+  border-color: #ffc107 !important;
+  color: #ffc107 !important;
+}
+
+.color-yellow-selected #product-detail-size-options .variant-option:hover {
+  background-color: #f8f9fa !important;
+  border-color: #ffc107 !important;
+  color: #ffc107 !important;
+}
+
+.color-yellow-selected #product-detail-size-options .variant-option.active {
+  background-color: #ffc107 !important;
+  border-color: #ffc107 !important;
+  color: #212529 !important;
+}
+
+/* Sửa màu nền cho màu đỏ */
+[data-color="Đỏ"] {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+[data-color="Đỏ"]:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+[data-color="Đỏ"].active {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+  opacity: 1 !important;
+  transform: scale(1.05) !important;
+}
+
+/* Sửa màu nền cho màu vàng */
+[data-color="Vàng"] {
+  background-color: #ffc107 !important;
+  border-color: #ffc107 !important;
+  color: #212529 !important;
+}
+
+[data-color="Vàng"]:hover {
+  background-color: #e0a800 !important;
+  border-color: #d39e00 !important;
+}
+
+[data-color="Vàng"].active {
+  background-color: #ffc107 !important;
+  border-color: #ffc107 !important;
+  color: #212529 !important;
+  opacity: 1 !important;
+  transform: scale(1.05) !important;
+}
+
+/* Quantity section */
+.quantity-section {
+  margin-bottom: 25px;
+}
+
+/* Add to cart button styles */
+.btn-add-to-cart {
+  background: #198754;
+  color: white;
+  border-color: #198754;
+}
+
+.btn-add-to-cart:hover {
+  background: #157347;
+  color: white;
+  border-color: #146c43;
+}
+
+.btn-add-to-cart:focus {
+  background: #198754;
+  color: white;
+  border-color: #198754;
+}
+
+/* Notification styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+}
+
+.notification.success {
+  background-color: #28a745;
+}
+
+.notification.error {
+  background-color: #dc3545;
+}
+
+.notification.info {
+  background-color: #17a2b8;
+}

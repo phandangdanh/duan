@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\SimpleAuthController;
 use App\Http\Controllers\Api\TestApiController;
 use App\Http\Controllers\Api\UserProfileController;
 use App\Http\Controllers\Api\TestAuthController;
+use App\Models\DonHang;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,7 @@ use App\Http\Controllers\Api\TestAuthController;
 // Simple Auth routes (public) - Không cần middleware phức tạp
 Route::post('/auth/login', [SimpleAuthController::class, 'login']);
 Route::post('/auth/register', [SimpleAuthController::class, 'register']);
+
 
 // Simple Auth routes (protected) - Chỉ cần auth:sanctum
 Route::middleware('auth:sanctum')->group(function () {
@@ -88,6 +90,7 @@ Route::prefix('products')->group(function () {
     // Public routes
     Route::get('/', [ApiProductController::class, 'index']);
     Route::get('{id}', [ApiProductController::class, 'show'])->where('id', '[0-9]+');
+    Route::get('{id}/images', [ApiProductController::class, 'getImages'])->where('id', '[0-9]+');
     
     // Protected routes (require product management permission)
     Route::middleware(['auth:sanctum', 'permission:manage_products'])->group(function () {
@@ -101,16 +104,24 @@ Route::prefix('products')->group(function () {
 
 // Orders API
 Route::prefix('orders')->group(function () {
+    // Public route để kiểm tra thanh toán (không cần đăng nhập)
+    Route::post('check-payment', [ApiOrderController::class, 'checkPayment']);
+    
     // Người dùng đã đăng nhập có thể xem đơn hàng của họ
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [ApiOrderController::class, 'index']);
         Route::post('/', [ApiOrderController::class, 'store']);
         Route::get('{id}', [ApiOrderController::class, 'show'])->where('id', '[0-9]+');
+        Route::post('{id}/cancel', [ApiOrderController::class, 'cancel'])->where('id', '[0-9]+');
+        Route::post('{id}/reorder', [ApiOrderController::class, 'reorder'])->where('id', '[0-9]+');
+        Route::get('user/my-orders', [ApiOrderController::class, 'myOrders']);
+        Route::get('user/order-history', [ApiOrderController::class, 'orderHistory']);
     });
     
     // Chỉ admin và manager có thể cập nhật và xóa đơn hàng
     Route::middleware(['auth:sanctum', 'permission:update_orders'])->group(function () {
         Route::put('{id}', [ApiOrderController::class, 'update'])->where('id', '[0-9]+');
+        Route::post('{id}/update-status', [ApiOrderController::class, 'updateStatus'])->where('id', '[0-9]+');
     });
     
     Route::middleware(['auth:sanctum', 'permission:delete_orders'])->group(function () {
@@ -131,4 +142,31 @@ Route::prefix('vouchers')->group(function () {
         Route::put('{id}', [ApiVoucherController::class, 'update'])->where('id', '[0-9]+');
         Route::delete('{id}', [ApiVoucherController::class, 'destroy'])->where('id', '[0-9]+');
     });
+});
+
+// Stock API (public)
+Route::prefix('stock')->group(function () {
+    Route::post('update', [ApiProductController::class, 'updateStock']);
+});
+
+// Product Stock API (public)
+Route::prefix('product')->group(function () {
+    Route::get('{id}/stock', [ApiProductController::class, 'getStock'])->where('id', '[0-9]+');
+    Route::get('{id}/detailed-stock', [ApiProductController::class, 'getDetailedStock'])->where('id', '[0-9]+');
+});
+
+// Cart Stock API (public)
+Route::prefix('cart')->group(function () {
+    Route::get('display-stock/{id}', [ApiProductController::class, 'getDisplayStock'])->where('id', '[0-9]+');
+});
+
+// Home API (public)
+Route::prefix('home')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\ApiHomeController::class, 'index']);
+    Route::get('/featured-products', [\App\Http\Controllers\Api\ApiHomeController::class, 'getFeaturedProducts']);
+    Route::get('/sale-products', [\App\Http\Controllers\Api\ApiHomeController::class, 'getSaleProducts']);
+    Route::get('/best-selling-products', [\App\Http\Controllers\Api\ApiHomeController::class, 'getBestSellingProducts']);
+    Route::get('/featured-categories', [\App\Http\Controllers\Api\ApiHomeController::class, 'getFeaturedCategories']);
+    Route::get('/statistics', [\App\Http\Controllers\Api\ApiHomeController::class, 'getStatistics']);
+    Route::get('/search', [\App\Http\Controllers\Api\ApiHomeController::class, 'search']);
 });

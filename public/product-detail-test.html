@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Product Detail Test</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="productId" class="form-label">Product ID:</label>
+                            <input type="number" id="productId" class="form-control" value="106" min="1">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success btn-lg" onclick="openProductDetail()">
+                                <i class="fas fa-eye me-2"></i>View Product Detail
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <h6>Quick Links:</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="setProductId(1)">ID: 1</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="setProductId(2)">ID: 2</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="setProductId(3)">ID: 3</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="setProductId(106)">ID: 106</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>API Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="testProductAPI()">
+                                <i class="fas fa-flask me-2"></i>Test Product API
+                            </button>
+                        </div>
+                        
+                        <div id="api-results" class="mt-3" style="max-height: 300px; overflow-y: auto;">
+                            <p class="text-muted">Click buttons to test APIs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Instructions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>✅ What's Fixed:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Added API system to product detail page</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>ProductDetailManager now loads data from API</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Dynamic price display from API</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Dynamic image loading from API</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Real-time stock info from API</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Color and size options from API</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>🔧 How to Test:</h6>
+                                <ol>
+                                    <li>Click "View Product Detail" to open the page</li>
+                                    <li>Check browser console for API logs</li>
+                                    <li>Verify price shows real data (not 0 VNĐ)</li>
+                                    <li>Verify images load properly</li>
+                                    <li>Test color and size selection</li>
+                                    <li>Test quantity and stock display</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getProductId() {
+            return document.getElementById('productId').value;
+        }
+
+        function setProductId(id) {
+            document.getElementById('productId').value = id;
+        }
+
+        function openProductDetail() {
+            const productId = getProductId();
+            const url = `http://localhost:8000/sanpham/${productId}`;
+            window.open(url, '_blank');
+            logResult(`Opening Product Detail: ${url}`);
+        }
+
+        async function testProductAPI() {
+            const productId = getProductId();
+            logResult(`Testing Product API for ID: ${productId}`);
+            
+            try {
+                const response = await fetch(`http://localhost:8000/api/products/${productId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    logResult('✅ Product API Success', {
+                        id: data.data.id,
+                        name: data.data.tenSP,
+                        price: data.data.gia,
+                        stock: data.data.soLuong,
+                        variants: data.data.chitietsanpham?.length || 0,
+                        images: data.data.hinhanh?.length || 0
+                    });
+                } else {
+                    logResult('❌ Product API Error', data);
+                }
+            } catch (error) {
+                logResult('❌ Product API Failed', { error: error.message });
+            }
+        }
+
+        function logResult(message, data = null) {
+            const resultsDiv = document.getElementById('api-results');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'mb-2 p-2 border rounded';
+            logEntry.innerHTML = `
+                <small class="text-muted">[${timestamp}]</small>
+                <strong>${message}</strong>
+                ${data ? `<pre class="mt-2 small">${JSON.stringify(data, null, 2)}</pre>` : ''}
+            `;
+            resultsDiv.insertBefore(logEntry, resultsDiv.firstChild);
+        }
+
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            logResult('📄 Page loaded - Ready to test product detail');
+            logResult('🚀 Laravel Development Server: http://localhost:8000');
+        });
+    </script>
+</body>
+</html>

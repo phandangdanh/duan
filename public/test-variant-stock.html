@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Variant Stock</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Variant Stock</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Issue</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <h6>❌ Issue:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Variant Selection:</strong> Đã chọn màu sắc + size</li>
+                                <li><strong>Stock Error:</strong> Vẫn thông báo lỗi khi thêm vào giỏ</li>
+                                <li><strong>Stock Calculation:</strong> Có thể variant stock không đúng</li>
+                                <li><strong>Data Format:</strong> Variant data có thể không đúng format</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="testVariantSelection()">Test Variant Selection</button>
+                        <button class="btn btn-success mb-2" onclick="testStockCalculation()">Test Stock Calculation</button>
+                        <button class="btn btn-warning mb-2" onclick="testAddToCart()">Test Add to Cart</button>
+                        <button class="btn btn-info mb-2" onclick="checkVariantData()">Check Variant Data</button>
+                        
+                        <div id="test-results" class="mt-3">
+                            <p class="text-muted">Click buttons to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Expected Console Logs</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>📋 When Adding Variant to Cart:</h6>
+                            <pre class="bg-light p-3">
+🛒 Adding to cart...
+🛒 Cart data: {product_id: 106, variant_id: 1, color_id: 1, size_id: 1, quantity: 1}
+🛒 Stock type: variant
+🛒 Quantity: 1
+🛒 Server response: {success: true}
+📦 getCurrentStock called
+🔍 getSelectedVariant called
+🔍 Selected color: 1
+🔍 Selected size: 1
+🔍 Product variants: [array of variants]
+🔍 Found variant: {id: 1, id_mausac: 1, id_size: 1, soLuong: 5, ...}
+📦 Selected variant: {id: 1, id_mausac: 1, id_size: 1, soLuong: 5, ...}
+📦 Stock data: {mainStock: 10, variants: {variant_1: 5}}
+📦 Variant stock (variant_1): 5
+📦 Current stock before update: 5
+📦 Quantity to subtract: 1
+📦 Updating local stock...
+✅ Cart addition completed
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Product Detail Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham/106" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Product Detail Page
+                        </a>
+                        
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Test Steps:</h6>
+                            <ol class="mb-0">
+                                <li>Open Product Detail Page</li>
+                                <li>Click color option (e.g., "Đỏ")</li>
+                                <li>Click size option (e.g., "S")</li>
+                                <li>Check console for variant selection logs</li>
+                                <li>Click "Thêm vào giỏ" button</li>
+                                <li>Check console for stock calculation logs</li>
+                                <li>Verify if error message appears</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock product data with variants
+        const mockProduct = {
+            id: 106,
+            soLuong: 10,
+            chitietsanpham: [
+                { id: 1, id_mausac: 1, id_size: 1, soLuong: 5, mausac: { ten: 'Đỏ' }, size: { ten: 'S' } },
+                { id: 2, id_mausac: 1, id_size: 2, soLuong: 3, mausac: { ten: 'Đỏ' }, size: { ten: 'M' } },
+                { id: 3, id_mausac: 2, id_size: 1, soLuong: 4, mausac: { ten: 'Vàng' }, size: { ten: 'S' } },
+                { id: 4, id_mausac: 2, id_size: 2, soLuong: 2, mausac: { ten: 'Vàng' }, size: { ten: 'M' } }
+            ]
+        };
+        
+        let selectedColor = 1;
+        let selectedSize = 1;
+        
+        function getSelectedVariant() {
+            console.log('🔍 getSelectedVariant called');
+            console.log('🔍 Selected color:', selectedColor);
+            console.log('🔍 Selected size:', selectedSize);
+            console.log('🔍 Product variants:', mockProduct.chitietsanpham);
+            
+            if (!selectedColor || !selectedSize || !mockProduct.chitietsanpham) {
+                console.log('🔍 No variant selected (missing color, size, or variants)');
+                return null;
+            }
+            
+            const variant = mockProduct.chitietsanpham.find(v => 
+                v.id_mausac === selectedColor && v.id_size === selectedSize
+            );
+            
+            console.log('🔍 Found variant:', variant);
+            return variant;
+        }
+        
+        function getCurrentStock() {
+            console.log('📦 getCurrentStock called');
+            const variant = getSelectedVariant();
+            const stockData = { mainStock: 10, variants: { variant_1: 5, variant_2: 3 } };
+            
+            console.log('📦 Selected variant:', variant);
+            console.log('📦 Stock data:', stockData);
+            
+            if (variant) {
+                const variantKey = `variant_${variant.id}`;
+                const variantStock = stockData.variants?.[variantKey] || variant.soLuong || 0;
+                console.log(`📦 Variant stock (${variantKey}):`, variantStock);
+                return variantStock;
+            } else {
+                const mainStock = stockData.mainStock || mockProduct.soLuong || 0;
+                console.log('📦 Main product stock:', mainStock);
+                return mainStock;
+            }
+        }
+        
+        function testVariantSelection() {
+            console.log('🧪 Testing variant selection...');
+            const variant = getSelectedVariant();
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Variant Selection Test:</h6>
+                    <p>Selected Color: ${selectedColor}</p>
+                    <p>Selected Size: ${selectedSize}</p>
+                    <p>Found Variant: ${variant ? `ID ${variant.id}, Stock: ${variant.soLuong}` : 'None'}</p>
+                </div>
+            `;
+        }
+        
+        function testStockCalculation() {
+            console.log('🧪 Testing stock calculation...');
+            const currentStock = getCurrentStock();
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📦 Stock Calculation Test:</h6>
+                    <p>Current Stock: ${currentStock}</p>
+                    <p>Selected Variant: ${getSelectedVariant() ? 'Yes' : 'No'}</p>
+                    <p>Stock Type: ${getSelectedVariant() ? 'Variant' : 'Main Product'}</p>
+                </div>
+            `;
+        }
+        
+        function testAddToCart() {
+            console.log('🧪 Testing add to cart...');
+            
+            const variant = getSelectedVariant();
+            const currentStock = getCurrentStock();
+            const quantity = 1;
+            
+            console.log('🛒 Cart data:', {
+                product_id: mockProduct.id,
+                variant_id: variant?.id,
+                color_id: selectedColor,
+                size_id: selectedSize,
+                quantity: quantity
+            });
+            
+            if (quantity > currentStock) {
+                console.log('❌ Not enough stock!');
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>❌ Add to Cart Test:</h6>
+                        <p>Error: Không đủ hàng! Chỉ còn ${currentStock} sản phẩm</p>
+                        <p>Requested: ${quantity}</p>
+                        <p>Available: ${currentStock}</p>
+                    </div>
+                `;
+            } else {
+                console.log('✅ Stock sufficient, adding to cart...');
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>✅ Add to Cart Test:</h6>
+                        <p>Success: Đã thêm vào giỏ hàng</p>
+                        <p>Variant: ${variant ? `ID ${variant.id}` : 'Main Product'}</p>
+                        <p>Stock: ${currentStock} → ${currentStock - quantity}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function checkVariantData() {
+            console.log('🧪 Checking variant data...');
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Variant Data:</h6>
+                    <pre>${JSON.stringify(mockProduct.chitietsanpham, null, 2)}</pre>
+                </div>
+            `;
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Variant stock test page loaded');
+            checkVariantData();
+        });
+    </script>
+</body>
+</html>

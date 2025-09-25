@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Stock Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Fix Stock Data</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Stock Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="stock-display">
+                            <p class="text-muted">Stock data will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Fix Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="fixStockData()">Fix Stock Data</button>
+                        <button class="btn btn-success mb-2" onclick="createTestStock()">Create Test Stock</button>
+                        <button class="btn btn-warning mb-2" onclick="clearStockData()">Clear Stock Data</button>
+                        
+                        <div id="fix-results" class="mt-3">
+                            <p class="text-muted">Click buttons to fix...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Pages</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham-api/106" target="_blank" class="btn btn-primary mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Product Detail
+                        </a>
+                        
+                        <a href="http://localhost:8000/giohang" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Cart Page
+                        </a>
+                        
+                        <div class="alert alert-info">
+                            <h6>🔍 Expected Results:</h6>
+                            <ul class="mb-0">
+                                <li>✅ <strong>Increase Quantity:</strong> Should work without stock errors</li>
+                                <li>✅ <strong>Decrease Quantity:</strong> Should work normally</li>
+                                <li>✅ <strong>No Server API Calls:</strong> Only localStorage operations</li>
+                                <li>✅ <strong>Stock Validation:</strong> Proper stock checking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function displayStockData() {
+            const stockData = localStorage.getItem('product_stock_106');
+            const cartData = localStorage.getItem('cart_data');
+            
+            let stockHtml = '';
+            let cartHtml = '';
+            
+            if (stockData) {
+                try {
+                    const stock = JSON.parse(stockData);
+                    stockHtml = `
+                        <div class="alert alert-info">
+                            <h6>📦 Product Stock (ID: 106):</h6>
+                            <p><strong>Main Stock:</strong> ${stock.mainStock || 0}</p>
+                            <p><strong>Variants:</strong></p>
+                            <ul class="mb-0">
+                                ${Object.entries(stock.variants || {}).map(([key, value]) => 
+                                    `<li>${key}: ${value}</li>`
+                                ).join('')}
+                            </ul>
+                        </div>
+                    `;
+                } catch (error) {
+                    stockHtml = `<div class="alert alert-danger">Error parsing stock data</div>`;
+                }
+            } else {
+                stockHtml = `<div class="alert alert-warning">No stock data found</div>`;
+            }
+            
+            if (cartData) {
+                try {
+                    const cart = JSON.parse(cartData);
+                    cartHtml = `
+                        <div class="alert alert-success">
+                            <h6>🛒 Cart Items:</h6>
+                            <ul class="mb-0">
+                                ${cart.map(item => 
+                                    `<li>${item.name} (${item.variant_id ? 'Variant' : 'Main'}) - Qty: ${item.quantity}</li>`
+                                ).join('')}
+                            </ul>
+                        </div>
+                    `;
+                } catch (error) {
+                    cartHtml = `<div class="alert alert-danger">Error parsing cart data</div>`;
+                }
+            } else {
+                cartHtml = `<div class="alert alert-warning">No cart data found</div>`;
+            }
+            
+            document.getElementById('stock-display').innerHTML = stockHtml + cartHtml;
+        }
+        
+        function fixStockData() {
+            // Create proper stock data for product 106
+            const stockData = {
+                mainStock: 20, // Increase main stock
+                variants: {
+                    variant_136: 15, // Red - 38
+                    variant_137: 15, // Red - 39
+                    variant_138: 15, // Red - 40
+                    variant_139: 15, // Blue - 38
+                    variant_140: 15  // Blue - 39
+                }
+            };
+            
+            localStorage.setItem('product_stock_106', JSON.stringify(stockData));
+            
+            document.getElementById('fix-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Stock Data Fixed:</h6>
+                    <p>Main Stock: 20</p>
+                    <p>All Variants: 15 each</p>
+                    <p>Now you can increase quantities!</p>
+                </div>
+            `;
+            
+            displayStockData();
+        }
+        
+        function createTestStock() {
+            // Create test stock data
+            const stockData = {
+                mainStock: 50,
+                variants: {
+                    variant_136: 30,
+                    variant_137: 30,
+                    variant_138: 30,
+                    variant_139: 30,
+                    variant_140: 30
+                }
+            };
+            
+            localStorage.setItem('product_stock_106', JSON.stringify(stockData));
+            
+            // Create test cart
+            const testCart = [
+                {
+                    product_id: 106,
+                    variant_id: 0,
+                    quantity: 5,
+                    name: 'Quần thun',
+                    price: 500000,
+                    image: '/backend/img/p1.jpg',
+                    color_name: null,
+                    size_name: null
+                },
+                {
+                    product_id: 106,
+                    variant_id: 136,
+                    quantity: 3,
+                    name: 'Quần thun',
+                    price: 22222,
+                    image: '/backend/img/p1.jpg',
+                    color_name: 'Đỏ',
+                    size_name: '38'
+                }
+            ];
+            
+            localStorage.setItem('cart_data', JSON.stringify(testCart));
+            
+            document.getElementById('fix-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Test Data Created:</h6>
+                    <p>Stock: Main=50, Variants=30 each</p>
+                    <p>Cart: 2 items with proper quantities</p>
+                    <p>Ready for testing!</p>
+                </div>
+            `;
+            
+            displayStockData();
+        }
+        
+        function clearStockData() {
+            localStorage.removeItem('product_stock_106');
+            localStorage.removeItem('cart_data');
+            
+            document.getElementById('fix-results').innerHTML = `
+                <div class="alert alert-warning">
+                    <h6>⚠️ Stock Data Cleared:</h6>
+                    <p>All stock and cart data removed</p>
+                    <p>Start fresh!</p>
+                </div>
+            `;
+            
+            displayStockData();
+        }
+        
+        // Auto-load on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Stock fix page loaded');
+            displayStockData();
+        });
+    </script>
+</body>
+</html>

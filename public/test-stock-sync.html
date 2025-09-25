@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Stock Sync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Test Stock Sync Between Cart & Product Detail</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Stock Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="stock-display">
+                            <p class="text-muted">Stock data will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="checkStockSync()">Check Stock Sync</button>
+                        <button class="btn btn-success mb-2" onclick="createTestStock()">Create Test Stock</button>
+                        <button class="btn btn-warning mb-2" onclick="simulateCartUpdate()">Simulate Cart Update</button>
+                        <button class="btn btn-info mb-2" onclick="simulateProductDetailUpdate()">Simulate Product Detail Update</button>
+                        
+                        <div id="test-results" class="mt-3">
+                            <p class="text-muted">Click buttons to test...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Current Cart Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="cart-display">
+                            <p class="text-muted">Cart data will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Stock Sync Logic</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>🔄 Stock Sync Process:</h6>
+                            <ol class="mb-0">
+                                <li><strong>Cart Update:</strong> Updates localStorage stock</li>
+                                <li><strong>Product Detail:</strong> Reads from localStorage</li>
+                                <li><strong>Real-time Sync:</strong> Both pages use same data</li>
+                                <li><strong>Stock Validation:</strong> Prevents overselling</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Pages</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="http://localhost:8000/sanpham-api/106" target="_blank" class="btn btn-primary mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Product Detail
+                        </a>
+                        
+                        <a href="http://localhost:8000/giohang" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-external-link-alt"></i> Test Cart Page
+                        </a>
+                        
+                        <div class="alert alert-success">
+                            <h6>✅ Expected Results:</h6>
+                            <ul class="mb-0">
+                                <li>✅ <strong>Cart Update:</strong> Stock decreases in localStorage</li>
+                                <li>✅ <strong>Product Detail:</strong> Reads updated stock from localStorage</li>
+                                <li>✅ <strong>Real-time Sync:</strong> Both pages show same stock</li>
+                                <li>✅ <strong>Stock Validation:</strong> Prevents adding more than available</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkStockSync() {
+            const productId = 106;
+            const storageKey = `product_stock_${productId}`;
+            const stored = localStorage.getItem(storageKey);
+            
+            if (!stored) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Stock Data:</h6>
+                        <p>No stock data found for product ${productId}</p>
+                        <p>Click "Create Test Stock" to create sample data</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const stockData = JSON.parse(stored);
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Stock Data Found:</h6>
+                    <p><strong>Main Product Stock:</strong> ${stockData.mainStock || 0}</p>
+                    <p><strong>Variants:</strong></p>
+                    <ul class="mb-0">
+                        ${Object.entries(stockData.variants || {}).map(([key, value]) => 
+                            `<li>${key}: ${value}</li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            displayStockData();
+        }
+        
+        function createTestStock() {
+            const productId = 106;
+            const storageKey = `product_stock_${productId}`;
+            
+            const testStockData = {
+                mainStock: 10,
+                variants: {
+                    variant_136: 10,
+                    variant_137: 10,
+                    variant_138: 10,
+                    variant_139: 10,
+                    variant_140: 10
+                }
+            };
+            
+            localStorage.setItem(storageKey, JSON.stringify(testStockData));
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>✅ Test Stock Created:</h6>
+                    <p>Main Product: 10</p>
+                    <p>Variants: 10 each (5 variants)</p>
+                </div>
+            `;
+            
+            displayStockData();
+        }
+        
+        function simulateCartUpdate() {
+            const productId = 106;
+            const storageKey = `product_stock_${productId}`;
+            const stored = localStorage.getItem(storageKey);
+            
+            if (!stored) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Stock Data:</h6>
+                        <p>Create test stock first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const stockData = JSON.parse(stored);
+            
+            // Simulate adding 2 items to cart (main product)
+            stockData.mainStock = Math.max(0, stockData.mainStock - 2);
+            
+            localStorage.setItem(storageKey, JSON.stringify(stockData));
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>🛒 Cart Update Simulated:</h6>
+                    <p>Added 2 main products to cart</p>
+                    <p>Main stock: ${stockData.mainStock + 2} → ${stockData.mainStock}</p>
+                </div>
+            `;
+            
+            displayStockData();
+        }
+        
+        function simulateProductDetailUpdate() {
+            const productId = 106;
+            const storageKey = `product_stock_${productId}`;
+            const stored = localStorage.getItem(storageKey);
+            
+            if (!stored) {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ No Stock Data:</h6>
+                        <p>Create test stock first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const stockData = JSON.parse(stored);
+            
+            // Simulate adding 1 variant to cart
+            const variantKey = 'variant_136';
+            if (stockData.variants && stockData.variants[variantKey] !== undefined) {
+                stockData.variants[variantKey] = Math.max(0, stockData.variants[variantKey] - 1);
+            }
+            
+            localStorage.setItem(storageKey, JSON.stringify(stockData));
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>🛍️ Product Detail Update Simulated:</h6>
+                    <p>Added 1 variant to cart</p>
+                    <p>Variant ${variantKey}: ${(stockData.variants[variantKey] || 0) + 1} → ${stockData.variants[variantKey] || 0}</p>
+                </div>
+            `;
+            
+            displayStockData();
+        }
+        
+        function displayStockData() {
+            const productId = 106;
+            const storageKey = `product_stock_${productId}`;
+            const stored = localStorage.getItem(storageKey);
+            
+            if (!stored) {
+                document.getElementById('stock-display').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>📭 No Stock Data</h6>
+                        <p>No stock data found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const stockData = JSON.parse(stored);
+            
+            document.getElementById('stock-display').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>📊 Current Stock:</h6>
+                    <p><strong>Main Product:</strong> ${stockData.mainStock || 0}</p>
+                    <p><strong>Variants:</strong></p>
+                    <ul class="mb-0">
+                        ${Object.entries(stockData.variants || {}).map(([key, value]) => 
+                            `<li>${key}: ${value}</li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        function displayCartData() {
+            const cartData = localStorage.getItem('cart_data');
+            let cartItems = [];
+            
+            if (cartData) {
+                try {
+                    cartItems = JSON.parse(cartData);
+                } catch (error) {
+                    console.error('Error parsing cart data:', error);
+                }
+            }
+            
+            if (cartItems.length === 0) {
+                document.getElementById('cart-display').innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>📭 Empty Cart</h6>
+                        <p>No items in cart</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            
+            document.getElementById('cart-display').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>🛒 Cart Summary:</h6>
+                    <p><strong>Total Items:</strong> ${cartItems.length}</p>
+                    <p><strong>Total Quantity:</strong> ${totalQuantity}</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Type</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${cartItems.map(item => `
+                                <tr>
+                                    <td>${item.name || 'Sản phẩm'}</td>
+                                    <td>
+                                        <span class="badge ${item.variant_id ? 'bg-info' : 'bg-primary'}">
+                                            ${item.variant_id ? 'Biến thể' : 'Sản phẩm chính'}
+                                        </span>
+                                    </td>
+                                    <td>${item.quantity}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // Auto-load on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Stock sync test page loaded');
+            displayStockData();
+            displayCartData();
+        });
+    </script>
+</body>
+</html>
